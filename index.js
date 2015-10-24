@@ -13,6 +13,8 @@ function createBufferLib (execlib) {
     StringUser: require('./stringusercreator')(execlib, BufferUser)
   };
 
+  ret.Logic = require('./logiccreator')(execlib, ret);
+
   return ret;
 }
 
