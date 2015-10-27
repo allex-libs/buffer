@@ -27,6 +27,18 @@ function createByteArrayUser(execlib, BufferUser) {
     this.cursor += this.len;
     return ret;
   };
+  ByteArrayUser.prototype.neededBytes = function () {
+    return this.len;
+  };
+  function buffWriter(buffer, item, index) {
+    buffer[index] = item;
+  }
+  ByteArrayUser.prototype.toBuffer = function (numarray, buffer) {
+    if(numarray.length!==this.len) {
+      throw new lib.Error('INVALID_NUMARRAY_LENGTH', 'Array of numbers provided to toBuffer needs to be '+this.len+' elements long');
+    }
+    numarray.forEach(buffWriter.bind(null, buffer));
+  };
 
   return ByteArrayUser;
 }

@@ -26,6 +26,14 @@ function createStringUser(execlib, BufferUser) {
       return ret;
     }
   };
+  StringUser.prototype.neededBytes = function (string) {
+    return Buffer.byteLength(string, 'utf8')+1;
+  };
+  StringUser.prototype.toBuffer = function (item, buffer) {
+    var strlen = this.neededBytes(item)-1;
+    buffer.write(item, 0, strlen, 'utf8');
+    buffer[strlen] = 0;
+  };
 
   return StringUser;
 }

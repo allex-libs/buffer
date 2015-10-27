@@ -14,6 +14,12 @@ function createUInt32BEUser(execlib, BufferUser) {
     this.cursor += 4;
     return ret;
   };
+  UInt32BEUser.prototype.neededBytes = function () {
+    return 4;
+  };
+  UInt32BEUser.prototype.toBuffer = function (item, buffer) {
+    buffer.writeUInt32BE(item, 0);
+  };
 
   return UInt32BEUser;
 }

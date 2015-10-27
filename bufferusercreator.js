@@ -37,6 +37,12 @@ function createBufferUser(execlib) {
     if (!this.buffer) {return null;}
     return this.buffer.slice(this.cursor);
   };
+  BufferUser.prototype.neededBytes = function () {
+    throw new lib.Error('NOT_IMPLEMENTED', 'Generic BufferUser does not implement neededBytes');
+  };
+  BufferUser.prototype.toBuffer = function (item, buffer) {
+    throw new lib.Error('NOT_IMPLEMENTED', 'Generic BufferUser does not implement toBuffer');
+  };
 
   return BufferUser;
 };

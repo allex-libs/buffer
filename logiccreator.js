@@ -3,20 +3,27 @@ function createLogic(execlib, bufferlib) {
   var lib = execlib.lib,
     q = lib.q;
 
+  var _UserWord = 'User';
+  function makeUpUserName(username) {
+    if (username.lastIndexOf(_UserWord) !== username.length-_UserWord.length) {
+      return username+'User';
+    }
+    return username;
+  }
   function userProducer(username, args) {
     if (lib.isString(username)) {
-      return new bufferlib[username]();
+      return new bufferlib[makeUpUserName(username)]();
     }
     if (lib.isArray(username)) {
       switch (username[1].length) {
         case 1:
-          return new bufferlib[username[0]](username[1][0]);
+          return new bufferlib[makeUpUserName(username[0])](username[1][0]);
         case 2:
-          return new bufferlib[username[0]](username[1][0], username[1][1]);
+          return new bufferlib[makeUpUserName(username[0])](username[1][0], username[1][1]);
         case 3:
-          return new bufferlib[username[0]](username[1][0], username[1][1], username[1][2]);
+          return new bufferlib[makeUpUserName(username[0])](username[1][0], username[1][1], username[1][2]);
         case 4:
-          return new bufferlib[username[0]](username[1][0], username[1][1], username[1][2], username[1][3]);
+          return new bufferlib[makeUpUserName(username[0])](username[1][0], username[1][1], username[1][2], username[1][3]);
       }
     }
   }
@@ -76,6 +83,31 @@ function createLogic(execlib, bufferlib) {
     var currentuser = this.users[this.current];
     if (!currentuser) {return null;}
     return currentuser.currentPosition();
+  };
+  function bytelenSummer(users, result, item, index) {
+    return result + users[index].neededBytes(item);
+  }
+  function bufferWriter(buffer, users, byteoffset, item, index) {
+    var user = users[index];
+    user.toBuffer(item, buffer.slice(byteoffset));
+    return byteoffset+user.neededBytes(item);
+  }
+  Logic.prototype.neededBytes = function (dataarray) {
+    if (dataarray.length !== this.users.length) {
+      throw new lib.Error('DATA_ARRAY_LENGTH_MISMATCH', 'Data array provided has to be '+this.users.length+' elements long');
+    }
+    return dataarray.reduce(bytelenSummer.bind(null, this.users), 0)
+  };
+  Logic.prototype.toBuffer = function (dataarray, buffer, offset) {
+    var buflen = this.neededBytes(dataarray), ret;
+    if (dataarray.length !== this.users.length) {
+      throw new lib.Error('DATA_ARRAY_LENGTH_MISMATCH', 'Data array provided has to be '+this.users.length+' elements long');
+    }
+    offset = offset || 0;
+    buffer = buffer || new Buffer(buflen);
+    ret = buffer.slice(offset, offset+buflen);
+    dataarray.reduce(bufferWriter.bind(null, ret, this.users), 0);
+    return ret;
   };
 
   return Logic;

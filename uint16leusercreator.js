@@ -14,6 +14,12 @@ function createUInt16LEUser(execlib, BufferUser) {
     this.cursor += 2;
     return ret;
   };
+  UInt16LEUser.prototype.neededBytes = function () {
+    return 2;
+  };
+  UInt16LEUser.prototype.toBuffer = function (item, buffer) {
+    buffer.writeUInt16LE(item, 0);
+  };
 
   return UInt16LEUser;
 }
