@@ -3,8 +3,8 @@ function createRMILogic(execlib, bufferlib) {
   var lib = execlib.lib,
     Logic = bufferlib.Logic;
 
-  function RMILogic(parameterslogic, frombuffercb) {
-    Logic.call(['String'].concat(parameterslogic), frombuffercb);
+  function RMILogic(rpclogic, frombuffercb) {
+    Logic.call(['String'].concat(rpclogic), frombuffercb);
   }
   lib.inherit(RMILogic, Logic);
 
