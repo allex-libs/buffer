@@ -7,7 +7,7 @@ function createByteUser(execlib, BufferUser) {
   }
   lib.inherit(ByteUser, BufferUser);
   ByteUser.prototype.use = function () {
-    if (this.availableBytes() < 2) {
+    if (this.availableBytes() < 1) {
       return;
     }
     var ret = this.buffer[this.cursor];
