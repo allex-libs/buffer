@@ -47,7 +47,7 @@ function createRPCLogic(execlib, bufferlib) {
       return;
     }
     mdpcbr = this.methodDescriptorProviderCB(methodname);
-    if ('function' === typeof mdpcbr.done) {
+    if (mdpcbr && 'function' === typeof mdpcbr.done) {
       mdpcbr.done(
         this.onMethodDescriptor.bind(this, methodname, methoddescriptor),
         this.onMethodDescriptor.bind(this, methodname, null)
@@ -61,21 +61,8 @@ function createRPCLogic(execlib, bufferlib) {
     this.logics.add(methodname, methoddescriptor ? this.buildLogic(methoddescriptor) : null);
   };
 
-  function userNameForParameterDescriptor(paramdesc) {
-    switch (paramdesc.type) {
-      case 'string':
-        return 'String';
-      case 'integer':
-        return 'IntegerString';
-      case 'object':
-        return 'JSONString';
-      case 'array':
-        return 'JSONString';
-    }
-  }
-
   RPCLogic.prototype.buildLogic = function (methoddescriptor) {
-    return new Logic(methoddescriptor.map(userNameForParameterDescriptor), this.onParams.bind(this));
+    return new Logic(bufferlib.jsonSchemaDescriptor2UserNames(userNameForParameterDescriptor), this.onParams.bind(this));
   };
 
   RPCLogic.prototype.onParams = function (params) {

@@ -30,7 +30,7 @@ function createStringUser(execlib, BufferUser) {
     return Buffer.byteLength(string, 'utf8')+1;
   };
   StringUser.prototype.toBuffer = function (item, buffer) {
-    var strlen = this.neededBytes(item)-1;
+    var strlen = Buffer.byteLength(item, 'utf8'); //don't use neededBytes because of overloaded versions...
     buffer.write(item, 0, strlen, 'utf8');
     buffer[strlen] = 0;
   };

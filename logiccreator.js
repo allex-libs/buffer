@@ -88,9 +88,9 @@ function createLogic(execlib, bufferlib) {
     return result + users[index].neededBytes(item);
   }
   function bufferWriter(buffer, users, byteoffset, item, index) {
-    var user = users[index];
-    user.toBuffer(item, buffer.slice(byteoffset));
-    return byteoffset+user.neededBytes(item);
+    var user = users[index], nb = user.neededBytes(item);
+    user.toBuffer(item, buffer.slice(byteoffset, byteoffset+nb));
+    return byteoffset+nb;
   }
   Logic.prototype.neededBytes = function (dataarray) {
     if (dataarray.length !== this.users.length) {
