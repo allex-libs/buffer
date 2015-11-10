@@ -8,6 +8,7 @@ function createBufferLib (execlib) {
     jsonSchemaDescriptor2UserNames: require('./jsonschemadescriptor2usernamescreator')(execlib),
     BufferUser: BufferUser,
     ByteUser: require('./byteusercreator')(execlib, BufferUser),
+    CharUser: require('./charusercreator')(execlib, BufferUser),
     UInt16LEUser: require('./uint16leusercreator')(execlib, BufferUser),
     UInt32BEUser: require('./uint32beusercreator')(execlib, BufferUser),
     UInt32LEUser: require('./uint32leusercreator')(execlib, BufferUser),
