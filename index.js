@@ -19,6 +19,7 @@ function createBufferLib (execlib) {
   };
 
   ret.Logic = require('./logiccreator')(execlib, ret);
+  ret.doUserSingleRMIMixin = require('./usertcpsinglermimixincreator')(execlib, ret);
 
   return ret;
 }
