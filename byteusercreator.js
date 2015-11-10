@@ -14,6 +14,12 @@ function createByteUser(execlib, BufferUser) {
     this.cursor += 1;
     return ret;
   };
+  ByteUser.prototype.neededBytes = function () {
+    return 1;
+  };
+  ByteUser.prototype.toBuffer = function (item, buffer) {
+    buffer[0] = item;
+  };
 
   return ByteUser;
 }
