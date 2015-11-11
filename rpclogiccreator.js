@@ -90,7 +90,6 @@ function createRPCLogic(execlib, bufferlib) {
       console.error('No methodname to run for params', params);
       throw new lib.Error('NO_METHODNAME_TO_RUN_FOR_PARAMS');
     }
-    console.log('methodname', this.methodname, 'params', params);
     var methodname = this.methodname,
       logic = this.parsingLogic,
       currpos = logic.currentPosition();
@@ -101,9 +100,11 @@ function createRPCLogic(execlib, bufferlib) {
     if (!this.outercb) {
       //this.destroy();
     } else {
-      params.unshift(methodname);
+      params = [methodname].concat(params);
+      console.log('calling out with', params);
       this.outercb(params);
     }
+    return 'stop';
   };
 
   RPCLogic.prototype.toBuffer = function (methodname, paramsarry) {

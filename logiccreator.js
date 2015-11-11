@@ -46,18 +46,26 @@ function createLogic(execlib, bufferlib) {
     if (!this.cb) {
       return;
     }
-    var ret = this.process(buffer);
+    var ret = this.process(buffer), shouldstop;
     while(ret) {
       if (!this.cb) {
         return;
       }
-      this.cb(ret);
+      shouldstop = this.cb(ret);
+      if (shouldstop === 'stop') {
+        this.reset();
+        this.current = 0;
+        return;
+      }
       ret = this.process();
     }
   };
   function resetter(user) {
     user.init(null);
   }
+  Logic.prototype.reset = function () {
+    this.users.forEach(resetter);
+  };
   Logic.prototype.process = function (buffer) {
     console.log('process?', buffer);
     var currentuser = this.users[this.current],
@@ -65,7 +73,7 @@ function createLogic(execlib, bufferlib) {
     if ('undefined' !== typeof ret) {
       if (currentuser.availableBytes() < 1){
         //console.log('resetting at ret', ret, 'current user', this.current, require('util').inspect(currentuser, {depth:null}));
-        this.users.forEach(resetter);
+        this.reset();
       }
       this.results[this.current] = ret;
       this.current++;

@@ -20,8 +20,8 @@ function createBufferLib (execlib) {
 
   ret.Logic = require('./logiccreator')(execlib, ret);
   ret.RPCLogic = require('./rpclogiccreator')(execlib, ret);
-  ret.doUserSingleRMIMixin = require('./usertcpsinglermimixincreator')(execlib, ret);
-  execlib.execSuite.taskRegistry.registerClass({name: 'runUserSingleRMITcpClient', klass: require('./usertcpsinglermiclientcreator')(execlib, ret)});
+  ret.doUserTCPRMIMixin = require('./usertcprmimixincreator')(execlib, ret);
+  execlib.execSuite.taskRegistry.registerClass({name: 'runUserRMITcpClient', klass: require('./usertcprmiclientcreator')(execlib, ret)});
 
   return ret;
 }
