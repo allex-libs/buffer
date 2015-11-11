@@ -59,6 +59,7 @@ function createLogic(execlib, bufferlib) {
     user.init(null);
   }
   Logic.prototype.process = function (buffer) {
+    console.log('process?', buffer);
     var currentuser = this.users[this.current],
       ret = currentuser.process(buffer);
     if ('undefined' !== typeof ret) {

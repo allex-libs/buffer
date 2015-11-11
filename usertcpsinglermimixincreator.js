@@ -5,13 +5,14 @@ function createUserTcpSingleRMIMixin (execlib, bufferlib) {
     q = lib.q;
 
 
-  function doMixin(User, ParentUser, usermethodname) {
+  function doMixin(User, ParentUser) {
     var ParentTcpServer = ParentUser.prototype.TcpTransmissionServer,
       ParentTcpHandler = ParentTcpServer.prototype.ConnectionHandler;
 
     function SingleRMITcpHandler(userserver, server, connection) {
       ParentTcpHandler.call(this, userserver, server, connection);
-      this.logic = new (bufferlib.Logic)(['Char', 'UInt16LE', 'UInt32LE'], this.onRequest.bind(this));
+      this.logic = new (bufferlib.RPCLogic)(User.prototype.__methodDescriptors, this.onRequest.bind(this));
+      //this.logic = new (bufferlib.Logic)(['String', 'Char', 'UInt16LE', 'UInt32LE'], this.onRequest.bind(this));
     }
     lib.inherit(SingleRMITcpHandler, ParentTcpHandler);
     SingleRMITcpHandler.prototype.destroy = function () {
@@ -31,7 +32,7 @@ function createUserTcpSingleRMIMixin (execlib, bufferlib) {
         this.connection.end();
         return;
       }
-      this.userserver.user[usermethodname].apply(this.userserver.user,reqarry).then(
+      this.userserver.user.exec(reqarry).then(
         this.doSend.bind(this),
         this.doEnd.bind(this)
       );
