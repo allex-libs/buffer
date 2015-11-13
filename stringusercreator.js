@@ -1,18 +1,18 @@
-function createStringUser(execlib, BufferUser) {
+function createStringUser(execlib, BufferUserBase) {
   'use strict';
   var lib = execlib.lib;
 
   function StringUser(buff, cursor) {
-    BufferUser.call(this, buff, cursor);
+    BufferUserBase.call(this, buff, cursor);
     this.start = null;
   }
-  lib.inherit(StringUser, BufferUser);
+  lib.inherit(StringUser, BufferUserBase);
   StringUser.prototype.destroy = function () {
     this.start = null;
-    BufferUser.prototype.destroy.call(this);
+    BufferUserBase.prototype.destroy.call(this);
   };
   StringUser.prototype.init = function (buff, cursor) {
-    BufferUser.prototype.init.call(this, buff, cursor);
+    BufferUserBase.prototype.init.call(this, buff, cursor);
     this.start = cursor;
   };
   StringUser.prototype.use = function () {

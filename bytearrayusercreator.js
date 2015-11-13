@@ -1,15 +1,15 @@
-function createByteArrayUser(execlib, BufferUser) {
+function createByteArrayUser(execlib, BufferUserBase) {
   'use strict';
   var lib = execlib.lib;
 
   function ByteArrayUser(len) {
-    BufferUser.call(this);
+    BufferUserBase.call(this);
     this.len = len;
   }
-  lib.inherit(ByteArrayUser, BufferUser);
+  lib.inherit(ByteArrayUser, BufferUserBase);
   ByteArrayUser.prototype.destroy = function () {
     this.len = null;
-    BufferUser.prototype.destroy.call(this);
+    BufferUserBase.prototype.destroy.call(this);
   };
   ByteArrayUser.prototype.use = function () {
     if (!this.buffer) {

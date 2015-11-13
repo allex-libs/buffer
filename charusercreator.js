@@ -1,11 +1,11 @@
-function createCharUser(execlib, BufferUser) {
+function createCharUser(execlib, BufferUserBase) {
   'use strict';
   var lib = execlib.lib;
 
   function CharUser() {
-    BufferUser.call(this);
+    BufferUserBase.call(this);
   }
-  lib.inherit(CharUser, BufferUser);
+  lib.inherit(CharUser, BufferUserBase);
   CharUser.prototype.use = function () {
     if (this.availableBytes() < 1) {
       return;

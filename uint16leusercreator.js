@@ -1,11 +1,11 @@
-function createUInt16LEUser(execlib, BufferUser) {
+function createUInt16LEUser(execlib, BufferUserBase) {
   'use strict';
   var lib = execlib.lib;
   
   function UInt16LEUser() {
-    BufferUser.call(this);
+    BufferUserBase.call(this);
   }
-  lib.inherit(UInt16LEUser, BufferUser);
+  lib.inherit(UInt16LEUser, BufferUserBase);
   UInt16LEUser.prototype.use = function () {
     if (this.availableBytes() < 2) {
       return;

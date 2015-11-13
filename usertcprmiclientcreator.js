@@ -51,16 +51,18 @@ function createUserTcpSingleRMIClient(execlib, bufferlib) {
   function Client(ipaddress, sink, options, cb) {
     this.sinkDestroyedListener = sink.destroyed.attach(this.destroy.bind(this));
     this.cb = cb;
-    this.logic = new bufferlib.RPCLogic(sink.clientuser.__methodDescriptors);
-    this.onPacket = new lib.HookCollection();
+    this.client = new bufferlib.RPCLogicClient(sink.clientuser.__methodDescriptors);
+    //this.onPacket = new lib.HookCollection();
     this.task = taskRegistry.run('transmitTcp', {
       ipaddress: ipaddress,
       sink: sink,
       options: options,
       onPayloadNeeded: this.generateRequestDefer.bind(this),
-      onIncomingPacket: this.onPacket.fire.bind(this.onPacket)
+      //onIncomingPacket: this.onPacket.fire.bind(this.onPacket)
+      onIncomingPacket: this.onPacket.bind(this)
     });
     this.requestDefer = null;
+    this.buffer = null;
   }
   Client.prototype.destroy = function () {
     this.requestDefer = null;
@@ -68,27 +70,35 @@ function createUserTcpSingleRMIClient(execlib, bufferlib) {
       this.task.destroy();
     }
     this.task = null;
-    if (this.logic) {
-      this.logic.destroy();
+    if (this.rpclogic) {
+      this.rpclogic.destroy();
     }
-    this.logic = null;
+    this.rpclogic = null;
     this.cb = null;
     if (this.sinkDestroyedListener) {
       this.sinkDestroyedListener.destroy();
     }
     this.sinkDestroyedListener = null;
   };
-  Client.prototype.request = function () {
-    /*
-    if (arguments.length !== this.logic.users.length) {
-      throw new lib.Error('INVALID_NUMBER_OF_PARAMETERS', arguments.length+' != '+this.logic.users.length);
+  Client.prototype.onPacket = function (buff) {
+    this.client.takeBuffer(buff);
+  };
+  Client.prototype.call = function () {
+    try {
+    var pack = this.client.call.apply(this.client, arguments);
+    this.request(pack.buffer);
+    return pack.promise;
+    } catch(e) {
+      console.error(e.stack);
+      console.error(e);
     }
-    */
+  };
+  Client.prototype.request = function (buff) {
     if (!this.requestDefer) {
-      throw new lib.Error('REQUEST_DEFER_DOESNT_EXIST');
+      this.buffer = this.buffer ? Buffer.concat([this.buffer, buff]) : buff;
+      return;
     }
-    var buff = this.logic.toBuffer(arguments[0], Array.prototype.slice.call(arguments, 1)),
-      rd = this.requestDefer;
+    var rd = this.requestDefer;
     if (buff) {
       this.requestDefer = null;
       rd.resolve(buff);
@@ -96,15 +106,20 @@ function createUserTcpSingleRMIClient(execlib, bufferlib) {
     }
   };
   Client.prototype.generateRequestDefer = function () {
-    var cb;
+    var cb, b;
     if (this.requestDefer) {
       throw new lib.Error('REQUEST_DEFER_ALREADY_EXISTS');
+    }
+    if (this.buffer) {
+      b = this.buffer;
+      this.buffer = null;
+      return b;
     }
     this.requestDefer = q.defer();
     if (this.cb) {
       cb = this.cb;
       this.cb = null;
-      cb(this);
+      lib.runNext(cb.bind(null, this));
     }
     return this.requestDefer.promise;
   };

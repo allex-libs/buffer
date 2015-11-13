@@ -1,50 +1,46 @@
-function createBufferUser(execlib) {
+function createBufferUser(execlib, BufferUserBase) {
   'use strict';
-  var lib = execlib.lib;
+  var lib = execlib.lib,
+    _LENBUFFSIZE = 4;
 
-  function BufferUser() {
-    this.buffer = null;
-    this.cursor = null;
+  function BufferUser(buff, cursor) {
+    BufferUserBase.call(this, buff, cursor);
+    this.buflen = null;
   }
+  lib.inherit(BufferUser, BufferUserBase);
   BufferUser.prototype.destroy = function () {
-    this.cursor = null;
-    this.buffer = null;
+    this.buflen = null;
+    BufferUserBase.prototype.destroy.call(this);
   };
-  BufferUser.prototype.init = function (buff, cursor) {
-    this.buffer = buff;
-    this.cursor = cursor || 0;
-  };
-  BufferUser.prototype.process = function (buffer) {
-    var b = this.buffer;
-    if (buffer) {
-      if (b) {
-        //console.log('concating at cursor', this.cursor, 'with original bufflen', this.buffer.length, 'at', this.currentPosition());
-        this.buffer = Buffer.concat([b, buffer]);
-        //console.log('now the new bufflen is', this.buffer.length, 'and cursor is still', this.cursor, 'at', this.currentPosition());
-      } else {
-        this.init(buffer);
-      }
+  BufferUser.prototype.use = function () {
+    if (!this.buflen && this.availableBytes()>_LENBUFFSIZE) {
+      this.buflen = this.buffer.readUInt32LE(this.cursor);
     }
-    return this.use();
-  };
-  BufferUser.prototype.availableBytes = function () {
-    if (!this.buffer) {
-      return 0;
+    if (!this.buflen) {
+      return;
     }
-    return this.buffer.length - this.cursor;
+    var neededbytes = this.buflen+_LENBUFFSIZE,
+      availablebytes = this.buffer.length-this.cursor,
+      ret;
+    if (neededbytes<=availablebytes) {
+      //console.log('slicing from', this.cursor, 'for', this.buflen, 'bytes on buffer of', this.buffer.length, 'bytes');
+      ret = this.buffer.slice(this.cursor+_LENBUFFSIZE, this.cursor+_LENBUFFSIZE+this.buflen);
+      //console.log('final result is', ret);
+      this.buflen = null;
+      this.cursor += neededbytes;
+      return ret;
+    }
   };
-  BufferUser.prototype.currentPosition = function () {
-    if (!this.buffer) {return null;}
-    return this.buffer.slice(this.cursor);
+  BufferUser.prototype.neededBytes = function (buff) {
+    return buff.length+_LENBUFFSIZE;
   };
-  BufferUser.prototype.neededBytes = function () {
-    throw new lib.Error('NOT_IMPLEMENTED', 'Generic BufferUser does not implement neededBytes');
-  };
-  BufferUser.prototype.toBuffer = function (item, buffer) {
-    throw new lib.Error('NOT_IMPLEMENTED', 'Generic BufferUser does not implement toBuffer');
+  BufferUser.prototype.toBuffer = function (bufferitem, buffer) {
+    buffer.writeUInt32LE(bufferitem.length, 0);
+    bufferitem.copy(buffer, _LENBUFFSIZE);
   };
 
   return BufferUser;
-};
+}
 
 module.exports = createBufferUser;
+

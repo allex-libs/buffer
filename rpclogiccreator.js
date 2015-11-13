@@ -17,15 +17,17 @@ function createRPCLogic(execlib, bufferlib) {
   }
 
   function RPCLogic(methoddescriptorprovider, outercb) {
-    Logic.call(this, ['String'], this.onMethod.bind(this));
+    Logic.call(this, ['String', 'String'], this.onIDWithMethod.bind(this));
     this.logics = new lib.Map();
     this.methodDescriptorProvider = methoddescriptorprovider;
     this.parsingLogic = null;
     this.outercb = outercb;
+    this.caller = null;
   }
   lib.inherit(RPCLogic, Logic);
 
   RPCLogic.prototype.destroy = function () {
+    this.caller = null;
     this.outercb = null;
     this.parsingLogic = null;
     this.methodDescriptorProvider = null;
@@ -37,8 +39,9 @@ function createRPCLogic(execlib, bufferlib) {
     Logic.prototype.destroy.call(this);
   };
 
-  RPCLogic.prototype.onMethod = function () {
-    var methodname = this.results[0],
+  RPCLogic.prototype.onIDWithMethod = function () {
+    var callerid = this.results[0],
+      methodname = this.results[1],
       logic,
       mdpcbr;
    
@@ -46,15 +49,15 @@ function createRPCLogic(execlib, bufferlib) {
       throw new lib.Error('SHOULDNT_HAVE_HAD_PARSING_LOGIC');
       return;
     }
-    if (this.methodname) {
-      console.error('Already have unfinished methodname', this.methodname);
-      throw (new lib.Error('ALREADY_HAVE_UNFINISHED_METHODNAME', this.methodname));
+    if (this.caller) {
+      console.error('Already have unfinished caller', this.caller);
+      throw (new lib.Error('ALREADY_HAVE_UNFINISHED_CALLER', 'callerid: '+this.caller.callerid+', methodname: '+this.caller.methodname));
     }
     logic = this.getLogic(methodname);
-    this.methodname = methodname;
+    this.caller = {callerid: callerid, methodname: methodname};
     if (logic) {
       this.parsingLogic = logic;
-      console.log('methodname', methodname, '=> logic', logic);
+      //console.log('methodname', methodname, '=> logic', logic);
       logic.takeBuffer(this.currentPosition());
       return;
     }
@@ -73,10 +76,11 @@ function createRPCLogic(execlib, bufferlib) {
 
   RPCLogic.prototype.onMethodDescriptor = function (methodname, methoddescriptor) {
     if (!methoddescriptor) {
+      console.log('!', methodname);
       throw new lib.Error('NO_METHOD_DESCRIPTOR', methodname);
     }
     var logic = this.buildLogic(methoddescriptor);
-    console.log(methoddescriptor, '=>', logic);
+    //console.log(methoddescriptor, '=>', logic);
     this.logics.add(methodname, logic);
     return logic;
   };
@@ -86,29 +90,35 @@ function createRPCLogic(execlib, bufferlib) {
   };
 
   RPCLogic.prototype.onParams = function (params) {
-    if (!this.methodname) {
-      console.error('No methodname to run for params', params);
+    if (!this.caller) {
+      console.error('No caller to run for params', params);
       throw new lib.Error('NO_METHODNAME_TO_RUN_FOR_PARAMS');
     }
-    var methodname = this.methodname,
+    var callerid = this.caller.callerid,
+      methodname = this.caller.methodname,
       logic = this.parsingLogic,
       currpos = logic.currentPosition();
-    console.log('currentPosition', currpos);
-    this.methodname = null;
+    //console.log('currentPosition', currpos);
+    this.caller = null;
     this.parsingLogic = null;
     this.users[0].init(currpos, 0);
     if (!this.outercb) {
       //this.destroy();
     } else {
-      params = [methodname].concat(params);
-      console.log('calling out with', params);
-      this.outercb(params);
+      params = [methodname,params];
+      //console.log('calling out with', params);
+      try {
+      this.outercb(callerid, params);
+      } catch(e) {
+        console.error(e.stack);
+        console.error(e);
+      }
     }
     return 'stop';
   };
 
-  RPCLogic.prototype.toBuffer = function (methodname, paramsarry) {
-    var methodarry = [methodname],
+  RPCLogic.prototype.toBuffer = function (callerid, methodname, paramsarry) {
+    var methodarry = [callerid, methodname],
       methodnb = this.neededBytes(methodarry),
       logic = this.getLogic(methodname),
       paramsnb = logic.neededBytes(paramsarry),

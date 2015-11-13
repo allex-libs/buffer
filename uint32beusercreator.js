@@ -1,11 +1,11 @@
-function createUInt32BEUser(execlib, BufferUser) {
+function createUInt32BEUser(execlib, BufferUserBase) {
   'use strict';
   var lib = execlib.lib;
   
   function UInt32BEUser() {
-    BufferUser.call(this);
+    BufferUserBase.call(this);
   }
-  lib.inherit(UInt32BEUser, BufferUser);
+  lib.inherit(UInt32BEUser, BufferUserBase);
   UInt32BEUser.prototype.use = function () {
     if (this.availableBytes() < 4) {
       return;

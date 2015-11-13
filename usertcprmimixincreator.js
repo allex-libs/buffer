@@ -1,4 +1,4 @@
-function createUserTcpSingleRMIMixin (execlib, bufferlib) {
+function createUserTcpRMIMixin (execlib, bufferlib) {
   'use strict';
 
   var lib = execlib.lib,
@@ -9,24 +9,23 @@ function createUserTcpSingleRMIMixin (execlib, bufferlib) {
     var ParentTcpServer = ParentUser.prototype.TcpTransmissionServer,
       ParentTcpHandler = ParentTcpServer.prototype.ConnectionHandler;
 
-    function SingleRMITcpHandler(userserver, server, connection) {
+    function RMITcpHandler(userserver, server, connection) {
       ParentTcpHandler.call(this, userserver, server, connection);
-      this.logic = new (bufferlib.RPCLogic)(User.prototype.__methodDescriptors, this.onRequest.bind(this));
-      //this.logic = new (bufferlib.Logic)(['String', 'Char', 'UInt16LE', 'UInt32LE'], this.onRequest.bind(this));
+      this.rpcserver = new (bufferlib.RPCLogicServer)(this.userserver.user, User.prototype.__methodDescriptors, this.doSend.bind(this));
     }
-    lib.inherit(SingleRMITcpHandler, ParentTcpHandler);
-    SingleRMITcpHandler.prototype.destroy = function () {
-      if (this.logic) {
-        this.logic.destroy();
+    lib.inherit(RMITcpHandler, ParentTcpHandler);
+    RMITcpHandler.prototype.destroy = function () {
+      if (this.rpcserver) {
+        this.rpcserver.destroy();
       }
-      this.logic = null;
+      this.rpcserver = null;
       ParentTcpHandler.prototype.destroy.call(this);
     };
-    SingleRMITcpHandler.prototype.onPacketForProcess = function(buffer) {
-      console.log('giving', buffer, 'to logic');
-      this.logic.takeBuffer(buffer);
+    RMITcpHandler.prototype.onPacketForProcess = function(buffer) {
+      console.log('giving', buffer, 'to rpcserver');//, this.rpcserver);
+      this.rpcserver.takeBuffer(buffer);
     };
-    SingleRMITcpHandler.prototype.onRequest = function (reqarry) {
+    RMITcpHandler.prototype.onRequest = function (reqarry) {
       console.log('onRequest', reqarry);
       if (!(this.userserver && this.userserver.user)) {
         this.connection.end();
@@ -37,23 +36,25 @@ function createUserTcpSingleRMIMixin (execlib, bufferlib) {
         this.doEnd.bind(this)
       );
     };
-    SingleRMITcpHandler.prototype.doSend = function (buffer) {
-      this.connection.write(buffer);
+    RMITcpHandler.prototype.doSend = function (outbuff) {
+      if (this.connection) {
+        this.connection.write(outbuff);
+      }
     };
-    SingleRMITcpHandler.prototype.doEnd = function () {
+    RMITcpHandler.prototype.doEnd = function () {
       this.connection.end();
     };
 
-    function SingleRMITcpServer(user, options){
+    function RMITcpServer(user, options){
       ParentTcpServer.call(this, user, options);
     }
-    lib.inherit(SingleRMITcpServer, ParentTcpServer);
-    SingleRMITcpServer.prototype.ConnectionHandler = SingleRMITcpHandler;
+    lib.inherit(RMITcpServer, ParentTcpServer);
+    RMITcpServer.prototype.ConnectionHandler = RMITcpHandler;
 
-    User.prototype.TcpTransmissionServer = SingleRMITcpServer;
+    User.prototype.TcpTransmissionServer = RMITcpServer;
   }
 
   return doMixin;
 }
 
-module.exports = createUserTcpSingleRMIMixin;
+module.exports = createUserTcpRMIMixin;

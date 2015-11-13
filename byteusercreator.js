@@ -1,11 +1,11 @@
-function createByteUser(execlib, BufferUser) {
+function createByteUser(execlib, BufferUserBase) {
   'use strict';
   var lib = execlib.lib;
 
   function ByteUser() {
-    BufferUser.call(this);
+    BufferUserBase.call(this);
   }
-  lib.inherit(ByteUser, BufferUser);
+  lib.inherit(ByteUser, BufferUserBase);
   ByteUser.prototype.use = function () {
     if (this.availableBytes() < 1) {
       return;
