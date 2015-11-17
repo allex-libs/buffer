@@ -58,6 +58,7 @@ function createRPCLogic(execlib, bufferlib) {
     if (logic) {
       this.parsingLogic = logic;
       //console.log('methodname', methodname, '=> logic', logic);
+      console.log('logic buffer length', logic.buffer ? logic.buffer.length : 0);
       logic.takeBuffer(this.currentPosition());
       return;
     }

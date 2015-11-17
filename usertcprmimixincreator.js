@@ -22,7 +22,7 @@ function createUserTcpRMIMixin (execlib, bufferlib) {
       ParentTcpHandler.prototype.destroy.call(this);
     };
     RMITcpHandler.prototype.onPacketForProcess = function(buffer) {
-      console.log('giving', buffer, 'to rpcserver');//, this.rpcserver);
+      //console.log('giving', buffer, 'to rpcserver');//, this.rpcserver);
       this.rpcserver.takeBuffer(buffer);
     };
     RMITcpHandler.prototype.onRequest = function (reqarry) {

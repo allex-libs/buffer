@@ -20,11 +20,39 @@ function createBufferLib (execlib) {
   };
 
   ret.Logic = require('./logiccreator')(execlib, ret);
+  ret.SynchronousLogic = require('./synchronouslogiccreator')(execlib, ret);
   ret.RPCLogic = require('./rpclogiccreator')(execlib, ret);
   ret.RPCLogicServer = require('./rpclogicservercreator')(execlib, ret);
   ret.RPCLogicClient = require('./rpclogicclientcreator')(execlib, ret);
   ret.doUserTCPRMIMixin = require('./usertcprmimixincreator')(execlib, ret);
   execlib.execSuite.taskRegistry.registerClass({name: 'runUserRMITcpClient', klass: require('./usertcprmiclientcreator')(execlib, ret)});
+
+  ret.makeCodec = function(usernamearray, typename) {
+    if (!typename) {
+      throw new lib.Error('CODEC_TYPENAME_NEEDED');
+    }
+    var sl = new this.SynchronousLogic(usernamearray);
+    return {
+      encode: function (arry) {
+        try {
+        return sl.toBuffer(arry);
+        } catch(e) {
+          console.error(e.stack);
+          console.error(e);
+        }
+      },
+      decode: function (buff) {
+        try {
+        return sl.decode(buff);
+        } catch(e) {
+          console.error(e.stack);
+          console.error(e);
+        }
+      },
+      buffer: true,
+      type: typename
+    }
+  };
 
   return ret;
 }

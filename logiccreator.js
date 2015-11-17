@@ -29,6 +29,9 @@ function createLogic(execlib, bufferlib) {
   }
 
   function Logic(usernamearry, frombuffercb) {
+    if (!usernamearry) {
+      throw new lib.Error('USERNAME_ARRAY_NEEDED');
+    }
     this.users = usernamearry.map(userProducer);
     this.cb = frombuffercb;
     this.results = new Array(this.users.length);

@@ -77,9 +77,11 @@ function createRPCLogicServer(execlib, bufferlib) {
     return ret;
   }
   RPCLogicServer.prototype.onResolve = function (id, res) {
+    this.pendingDefers.remove(id);
     this.spit(['r', id, res]);
   }; 
   RPCLogicServer.prototype.onError = function (id, error) {
+    this.pendingDefers.remove(id);
     this.spit(['e', id, error]);
   }; 
   RPCLogicServer.prototype.onNotify = function (id, progress) {
