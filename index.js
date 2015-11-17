@@ -26,6 +26,7 @@ function createBufferLib (execlib) {
   ret.RPCLogicClient = require('./rpclogicclientcreator')(execlib, ret);
   ret.doUserTCPRMIMixin = require('./usertcprmimixincreator')(execlib, ret);
   execlib.execSuite.taskRegistry.registerClass({name: 'runUserRMITcpClient', klass: require('./usertcprmiclientcreator')(execlib, ret)});
+  ret.createTcpCallableStandalone = require('./tcpcallablestandalonecreator')(execlib, ret);
 
   ret.makeCodec = function(usernamearray, typename) {
     if (!typename) {
