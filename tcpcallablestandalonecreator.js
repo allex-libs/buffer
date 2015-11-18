@@ -4,6 +4,7 @@ function createTcpCallableStandalone(execlib, bufferlib) {
   function Connection(callable, socket) {
     this.callable = callable;
     this.socket = socket;
+    console.log('__methodDescriptors', this.callable.__methodDescriptors);
     this.rpcserver = new bufferlib.RPCLogicServer(this.callable, this.callable.__methodDescriptors, this.doSend.bind(this));
     this.socket.on('data', this.onData.bind(this));
     this.socket.on('error', this.destroy.bind(this));
@@ -18,6 +19,7 @@ function createTcpCallableStandalone(execlib, bufferlib) {
     this.callable = null;
   };
   Connection.prototype.onData = function (buffer) {
+    console.log('onData', buffer.toString());
     this.rpcserver.takeBuffer(buffer);
   };
   Connection.prototype.doSend = function (outbuff) {
