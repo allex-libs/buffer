@@ -11,9 +11,12 @@ function createUInt64LEUser(execlib, BufferUserBase) {
       return;
     }
     //var ret = this.buffer.readUInt64LE(this.cursor);
-    var ret = 0;
-    ret += (this.buffer.readUInt32LE(this.cursor));
-    ret += ( (this.buffer.readUInt32LE(this.cursor+4)) << 32);
+    var ret = 0,
+      lo = this.buffer.readUInt32LE(this.cursor),
+      hi = this.buffer.readUInt32LE(this.cursor+4);
+    ret += (lo);
+    ret += ( hi * 0x100000000);
+    console.log('lo', lo, 'hi', hi, '=>', ret);
     this.cursor += 8;
     return ret;
   };
@@ -22,8 +25,9 @@ function createUInt64LEUser(execlib, BufferUserBase) {
   };
   UInt64LEUser.prototype.toBuffer = function (item, buffer) {
     //buffer.writeUInt64LE(item, 0);
-    var hi = item >>> 32,
-      lo = item & 0x00000000f00000;
+    var hi = ~~(item / 0x100000000),
+      lo = item % 0x100000000;
+    console.log(item, '=> lo', lo, 'hi', hi);
     buffer.writeUInt32LE(lo, 0);
     buffer.writeUInt32LE(hi, 4);
   };
