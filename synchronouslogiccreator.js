@@ -10,9 +10,16 @@ function createSynchronousLogic(execlib, bufferlib) {
   }
   lib.inherit(SynchronousLogic, Logic);
   SynchronousLogic.prototype.decode = function (buffer) {
+    if (!Buffer.isBuffer(buffer)) {
+      return null;
+    }
+    if (buffer.length < 1) {
+      return null;
+    }
     this.gotit = false;
     this.takeBuffer(buffer);
     if (!this.gotit) {
+      console.log(buffer, 'not valid?');
       throw new lib.Error('INVALID_BUFFER_FOR_DECODE');
     }
     return this.results;
