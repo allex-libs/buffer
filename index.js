@@ -12,6 +12,7 @@ function createBufferLib (execlib) {
     UInt16LEUser: require('./uint16leusercreator')(execlib, BufferUserBase),
     UInt32BEUser: require('./uint32beusercreator')(execlib, BufferUserBase),
     UInt32LEUser: require('./uint32leusercreator')(execlib, BufferUserBase),
+    UInt64BEUser: require('./uint64beusercreator')(execlib, BufferUserBase),
     UInt64LEUser: require('./uint64leusercreator')(execlib, BufferUserBase),
     Int32LEUser: require('./int32leusercreator')(execlib, BufferUserBase),
     ByteArrayUser: require('./bytearrayusercreator')(execlib, BufferUserBase),

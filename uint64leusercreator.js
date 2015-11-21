@@ -16,7 +16,7 @@ function createUInt64LEUser(execlib, BufferUserBase) {
       hi = this.buffer.readUInt32LE(this.cursor+4);
     ret += (lo);
     ret += ( hi * 0x100000000);
-    console.log('lo', lo, 'hi', hi, '=>', ret);
+    //console.log('lo', lo, 'hi', hi, '=>', ret);
     this.cursor += 8;
     return ret;
   };
@@ -27,7 +27,7 @@ function createUInt64LEUser(execlib, BufferUserBase) {
     //buffer.writeUInt64LE(item, 0);
     var hi = ~~(item / 0x100000000),
       lo = item % 0x100000000;
-    console.log(item, '=> lo', lo, 'hi', hi);
+    //console.log(item, '=> lo', lo, 'hi', hi);
     buffer.writeUInt32LE(lo, 0);
     buffer.writeUInt32LE(hi, 4);
   };
