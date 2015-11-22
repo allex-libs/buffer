@@ -22,7 +22,7 @@ function createSynchronousLogic(execlib, bufferlib) {
       console.log(buffer, 'not valid?');
       throw new lib.Error('INVALID_BUFFER_FOR_DECODE');
     }
-    return this.results;
+    return this.results.slice(0);
   };
   SynchronousLogic.prototype.syncResult = function () {
     this.gotit = true;

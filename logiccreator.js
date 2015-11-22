@@ -60,6 +60,11 @@ function createLogic(execlib, bufferlib) {
         this.current = 0;
         return;
       }
+      if (q.isPromise(shouldstop)) {
+        //console.log('blocking on promise');
+        shouldstop.then(this.takeBuffer.bind(this, void 0));
+        return;
+      }
       ret = this.process();
     }
   };
