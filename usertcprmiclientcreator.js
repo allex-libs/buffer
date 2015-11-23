@@ -94,15 +94,17 @@ function createUserTcpSingleRMIClient(execlib, bufferlib) {
     }
   };
   Client.prototype.request = function (buff) {
-    if (!this.requestDefer) {
+    var rd = this.requestDefer;
+    if (!rd) {
+      console.log('cannot request now, will buffer the call');
       this.buffer = this.buffer ? Buffer.concat([this.buffer, buff]) : buff;
       return;
     }
-    var rd = this.requestDefer;
     if (buff) {
       this.requestDefer = null;
       rd.resolve(buff);
     } else {
+      console.error('buffer', buff, 'cannot go anywhere!');
     }
   };
   Client.prototype.generateRequestDefer = function () {
