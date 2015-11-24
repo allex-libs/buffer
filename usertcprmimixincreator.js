@@ -22,11 +22,11 @@ function createUserTcpRMIMixin (execlib, bufferlib) {
       ParentTcpHandler.prototype.destroy.call(this);
     };
     RMITcpHandler.prototype.onPacketForProcess = function(buffer) {
-      console.log('giving', buffer, 'to rpcserver');//, this.rpcserver);
+      //console.log('giving', buffer, 'to rpcserver');//, this.rpcserver);
       this.rpcserver.takeBuffer(buffer);
     };
     RMITcpHandler.prototype.onRequest = function (reqarry) {
-      console.log('onRequest', reqarry);
+      //console.log('onRequest', reqarry);
       if (!(this.userserver && this.userserver.user)) {
         this.connection.end();
         return;
@@ -50,6 +50,7 @@ function createUserTcpRMIMixin (execlib, bufferlib) {
     }
     lib.inherit(RMITcpServer, ParentTcpServer);
     RMITcpServer.prototype.ConnectionHandler = RMITcpHandler;
+    RMITcpServer.prototype.timeOutInSeconds = Infinity;
 
     User.prototype.TcpTransmissionServer = RMITcpServer;
   }

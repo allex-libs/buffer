@@ -36,8 +36,17 @@ function createLogic(execlib, bufferlib) {
     this.cb = frombuffercb;
     this.results = new Array(this.users.length);
     this.current = 0;
+    this.buffers = [];
+    this.blocked = false;
   }
   Logic.prototype.destroy = function () {
+    this.blocked = null;
+    if (this.buffers) {
+      if (this.buffers.length) {
+        console.error('BUFFERS NOT CONSUMED!');
+      }
+      this.buffers = null;
+    }
     this.results = null;
     this.cb = null;
     if (this.users) {
@@ -49,9 +58,14 @@ function createLogic(execlib, bufferlib) {
     if (!this.cb) {
       return;
     }
+    if (this.blocked) {
+      this.buffers.push(buffer);
+      return;
+    };
     var ret = this.process(buffer), shouldstop;
     while(ret) {
       if (!this.cb) {
+        console.log('no cb, will get out now');
         return;
       }
       shouldstop = this.cb(ret);
@@ -62,15 +76,24 @@ function createLogic(execlib, bufferlib) {
       }
       if (q.isPromise(shouldstop)) {
         //console.log('blocking on promise');
-        shouldstop.then(this.takeBuffer.bind(this, void 0));
+        this.blocked = true;
+        shouldstop.then(this.unblock.bind(this));
         return;
       }
       ret = this.process();
+    }
+    buffer = this.buffers.shift();
+    if (buffer) {
+      this.takeBuffer(buffer);
     }
   };
   function resetter(user) {
     user.init(null);
   }
+  Logic.prototype.unblock = function () {
+    this.blocked = false;
+    this.takeBuffer();
+  };
   Logic.prototype.reset = function () {
     this.users.forEach(resetter);
   };
