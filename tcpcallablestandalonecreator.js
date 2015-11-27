@@ -1,13 +1,14 @@
 var net = require('net');
 
 function createTcpCallableStandalone(execlib, bufferlib) {
+  'use strict';
   function Connection(callable, socket) {
     this.callable = callable;
     this.callable.needToSend = this.sendData.bind(this);
     this.socket = socket;
     console.log('__methodDescriptors', this.callable.__methodDescriptors);
     this.rpcserver = new bufferlib.RPCLogicServer(this.callable, this.callable.__methodDescriptors, this.doSend.bind(this));
-    this.oobLogic = new bufferlib.Logic(['Char', 'String', 'Char', 'JSONString']);
+    //this.oobLogic = new bufferlib.Logic(['Char', 'String', 'Char', 'JSONString']);
     this.socket.on('data', this.onData.bind(this));
     this.socket.on('error', this.destroy.bind(this));
     this.socket.on('close', this.destroy.bind(this));
@@ -35,7 +36,8 @@ function createTcpCallableStandalone(execlib, bufferlib) {
     console.log('should send data', data);
     var oob = data.oob;
     if (oob) {
-      this.doSend(this.oobLogic.toBuffer(['o', oob[0], oob[1], oob[2]]));
+      this.rpcserver.spit(['o', oob[0], [oob[1], oob[2]]]);
+      //this.doSend(this.oobLogic.toBuffer(['o', oob[0], oob[1], oob[2]]));
     }
   };
 

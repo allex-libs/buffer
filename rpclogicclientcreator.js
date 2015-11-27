@@ -55,6 +55,9 @@ function createRPCLogicClient(execlib, bufferlib) {
       case 'n':
         this.notifyDefer(id, this.content(contentmode, content));
         break;
+      case 'o':
+        console.log('OOB!', this.content(contentmode, content));
+        break;
     }
     } catch(e) {
       console.error(e.stack);
