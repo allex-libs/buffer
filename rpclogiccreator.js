@@ -1,7 +1,8 @@
 function createRPCLogic(execlib, bufferlib) {
   'use strict';
   var lib = execlib.lib,
-    Logic = bufferlib.Logic;
+    Logic = bufferlib.Logic,
+    ConditionalLogic = bufferlib.ConditionalLogic;
 
   function createMethodDescriptorProviderCB (methoddescriptorprovider) {
     if ('function' === typeof methoddescriptorprovider) {
@@ -17,26 +18,27 @@ function createRPCLogic(execlib, bufferlib) {
   }
 
   function RPCLogic(methoddescriptorprovider, outercb) {
-    Logic.call(this, ['String', 'String'], this.onIDWithMethod.bind(this));
-    this.logics = new lib.Map();
+    ConditionalLogic.call(this, outercb);//this, ['String', 'String'], this.onIDWithMethod.bind(this));
     this.methodDescriptorProvider = methoddescriptorprovider;
-    this.parsingLogic = null;
-    this.outercb = outercb;
     this.caller = null;
   }
-  lib.inherit(RPCLogic, Logic);
+  lib.inherit(RPCLogic, ConditionalLogic);
 
   RPCLogic.prototype.destroy = function () {
     this.caller = null;
-    this.outercb = null;
-    this.parsingLogic = null;
     this.methodDescriptorProvider = null;
-    if (this.logics) {
-      lib.containerDestroyAll(this.logics);
-      this.logics.destroy();
+    ConditionalLogic.prototype.destroy.call(this);
+  };
+
+  RPCLogic.prototype.logicNameFromResults = function () {
+    var callerid = this.results[0],
+      methodname = this.results[1];
+    if (this.caller) {
+      console.error('Already have unfinished caller', this.caller);
+      throw (new lib.Error('ALREADY_HAVE_UNFINISHED_CALLER', 'callerid: '+this.caller.callerid+', methodname: '+this.caller.methodname));
     }
-    this.logics = null;
-    Logic.prototype.destroy.call(this);
+    this.caller = {callerid: callerid, methodname: methodname};
+    return methodname;
   };
 
   RPCLogic.prototype.onIDWithMethod = function () {
@@ -64,11 +66,7 @@ function createRPCLogic(execlib, bufferlib) {
     }
   };
 
-  RPCLogic.prototype.getLogic = function (methodname) {
-    var ret = this.logics.get(methodname);
-    if (ret) {
-      return ret;
-    }
+  RPCLogic.prototype.onMissingLogic = function (methodname) {
     if ('object' === typeof this.methodDescriptorProvider) {
       return this.onMethodDescriptor(methodname, this.methodDescriptorProvider[methodname]);
     }
@@ -96,26 +94,9 @@ function createRPCLogic(execlib, bufferlib) {
       throw new lib.Error('NO_METHODNAME_TO_RUN_FOR_PARAMS');
     }
     var callerid = this.caller.callerid,
-      methodname = this.caller.methodname,
-      logic = this.parsingLogic,
-      currpos = logic.currentPosition();
-    //console.log('currentPosition', currpos);
+      methodname = this.caller.methodname;
     this.caller = null;
-    this.parsingLogic = null;
-    this.users[0].init(currpos, 0);
-    if (!this.outercb) {
-      //this.destroy();
-    } else {
-      params = [methodname,params];
-      //console.log('calling out with', params);
-      try {
-      this.outercb(callerid, params);
-      } catch(e) {
-        console.error(e.stack);
-        console.error(e);
-      }
-    }
-    return 'stop';
+    this.finalizeCycle(callerid, [methodname,params.slice()]);
   };
 
   RPCLogic.prototype.toBuffer = function (callerid, methodname, paramsarry) {
@@ -129,6 +110,8 @@ function createRPCLogic(execlib, bufferlib) {
     logic.toBuffer(paramsarry, buffer, methodnb);
     return buffer;
   };
+
+  RPCLogic.prototype.criteriaLogicUserNames = ['String', 'String'];
 
   return RPCLogic;
 }

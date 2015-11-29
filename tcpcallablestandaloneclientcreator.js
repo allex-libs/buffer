@@ -34,9 +34,14 @@ function createTcpCallableStandaloneClient(execlib, bufferlib) {
   };
   TcpCallableStandaloneClient.prototype.onServicePack = function (servicepack) {
     console.log('servicepack', servicepack);
+    try {
     var serviceuserprototype = servicepack.Service.prototype.userFactory.get('service').prototype;
     this.rpcclient = new bufferlib.RPCLogicClient(serviceuserprototype.__methodDescriptors);
     this.goConnect();
+    } catch(e) {
+      console.error(e.stack);
+      console.error(e);
+    }
   };
   TcpCallableStandaloneClient.prototype.onServicePackError = function (error) {
     if (this.socket) {

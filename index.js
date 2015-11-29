@@ -24,6 +24,7 @@ function createBufferLib (execlib) {
 
   ret.Logic = require('./logiccreator')(execlib, ret);
   ret.SynchronousLogic = require('./synchronouslogiccreator')(execlib, ret);
+  ret.ConditionalLogic = require('./conditionallogiccreator')(execlib, ret);
   ret.RPCLogic = require('./rpclogiccreator')(execlib, ret);
   ret.RPCLogicServer = require('./rpclogicservercreator')(execlib, ret);
   ret.RPCLogicClient = require('./rpclogicclientcreator')(execlib, ret);

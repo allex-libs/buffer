@@ -8,18 +8,24 @@ function createTcpCallableStandalone(execlib, bufferlib) {
     this.socket = socket;
     console.log('__methodDescriptors', this.callable.__methodDescriptors);
     this.rpcserver = new bufferlib.RPCLogicServer(this.callable, this.callable.__methodDescriptors, this.doSend.bind(this));
-    //this.oobLogic = new bufferlib.Logic(['Char', 'String', 'Char', 'JSONString']);
+    this.oobLogic = new bufferlib.Logic(['Char', 'String', 'Char', 'Char', 'Buffer']);
     this.socket.on('data', this.onData.bind(this));
     this.socket.on('error', this.destroy.bind(this));
     this.socket.on('close', this.destroy.bind(this));
   }
   Connection.prototype.destroy = function () {
+    if (this.oobLogic) {
+      this.oobLogic.destroy();
+    }
+    this.oobLogic = null;
     if (this.rpcserver) {
       this.rpcserver.destroy();
     }
     this.rpcserver = null;
     this.socket = null;
-    this.callable.needToSend = null;
+    if (this.callable) {
+      this.callable.needToSend = null;
+    }
     this.callable = null;
   };
   Connection.prototype.onData = function (buffer) {
@@ -36,8 +42,9 @@ function createTcpCallableStandalone(execlib, bufferlib) {
     console.log('should send data', data);
     var oob = data.oob;
     if (oob) {
-      this.rpcserver.spit(['o', oob[0], [oob[1], oob[2]]]);
+      //this.rpcserver.spit(['o', oob[0], [oob[1], JSON.stringify(oob[2])]]);
       //this.doSend(this.oobLogic.toBuffer(['o', oob[0], oob[1], oob[2]]));
+      this.doSend(this.rpcserver.pack(['o', oob[0], oob[1], oob[2]], this.oobLogic));
     }
   };
 

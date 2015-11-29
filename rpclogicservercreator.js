@@ -5,10 +5,6 @@ function createRPCLogicServer(execlib, bufferlib) {
     RPCLogic = bufferlib.RPCLogic,
     _outLogic = new bufferlib.Logic(['Char', 'String', 'Char', 'Buffer']);
 
-  function nonBufferContentToBuffer (content) {
-    return new Buffer(JSON.stringify(content), 'utf8');
-  }
-
   function PendingDefer() {
     this.id = lib.uid();
     this.defer = q.defer();
@@ -62,20 +58,26 @@ function createRPCLogicServer(execlib, bufferlib) {
       this.destroy();
       return;
     }
-    this.outcb(pack(outarry));
+    this.outcb(this.pack(outarry));
   }
-  function pack(outarry) {
-    var content = outarry[2],
+  RPCLogicServer.prototype.pack = function (outarry, outlogic) {
+    var content = outarry[outarry.length-1],
       b;
     if (Buffer.isBuffer(content)) {
-      outarry = [outarry[0], outarry[1], 'b', content];
+      outarry = outarry.slice(0,-1).concat(['b', content]);
+      //outarry = [outarry[0], outarry[1], 'b', content];
     } else {
-      outarry = [outarry[0], outarry[1], 'j', nonBufferContentToBuffer(content)];
+      outarry = outarry.slice(0,-1).concat(['j', this.nonBufferContentToBuffer(content)]);
+      //outarry = [outarry[0], outarry[1], 'j', this.nonBufferContentToBuffer(content)];
     }
-    var ret = _outLogic.toBuffer(outarry);
-    //console.log('spit', outarry, '=>', ret);
+    var ret = (outlogic || _outLogic).toBuffer(outarry);
+    console.log('pack', outarry, '=>', ret);
     return ret;
-  }
+  };
+  RPCLogicServer.prototype.nonBufferContentToBuffer = function(content) {
+    return new Buffer(JSON.stringify(content), 'utf8');
+  };
+
   RPCLogicServer.prototype.onResolve = function (id, res) {
     this.pendingDefers.remove(id);
     this.spit(['r', id, res]);

@@ -3,9 +3,28 @@ function createRPCLogicClient(execlib, bufferlib) {
   var lib = execlib.lib,
     q = lib.q;
 
+  function InLogic(outercb) {
+    bufferlib.ConditionalLogic.call(this,outercb);
+    this.logics.add('a', new bufferlib.Logic(['String', 'Char', 'Buffer'], this.onParseDone.bind(this, 'a')));
+    this.logics.add('r', new bufferlib.Logic(['String', 'Char', 'Buffer'], this.onParseDone.bind(this, 'r')));
+    this.logics.add('e', new bufferlib.Logic(['String', 'Char', 'Buffer'], this.onParseDone.bind(this, 'e')));
+    this.logics.add('n', new bufferlib.Logic(['String', 'Char', 'Buffer'], this.onParseDone.bind(this, 'n')));
+    this.logics.add('o', new bufferlib.Logic(['String', 'Char', 'Char', 'Buffer'], this.onParseDone.bind(this, 'o')));
+  }
+  lib.inherit(InLogic, bufferlib.ConditionalLogic);
+  InLogic.prototype.logicNameFromResults = function () {
+    console.log('InLogic logicNameFromResults', this.results);
+    return this.results[0];
+  };
+  InLogic.prototype.onParseDone = function (modechar, params){
+    this.finalizeCycle([modechar].concat(params));
+  };
+  InLogic.prototype.criteriaLogicUserNames = ['Char'];
+
   function RPCLogicClient(methoddescriptorprovider) {
     this.rpclogic = new bufferlib.RPCLogic(methoddescriptorprovider);
-    this.inlogic = new bufferlib.Logic(['Char', 'String', 'Char', 'Buffer'], this.onResponse.bind(this));
+    //this.inlogic = new bufferlib.Logic(['Char', 'String', 'Char', 'Buffer'], this.onResponse.bind(this));
+    this.inlogic = new InLogic(this.onResponse.bind(this));
     this.mydefers = new lib.Map();
     this.hisdefers = new lib.Map();
   }
@@ -37,11 +56,12 @@ function createRPCLogicClient(execlib, bufferlib) {
   };
   RPCLogicClient.prototype.onResponse = function (inarry) {
     try {
-    //console.log('onResponse', inarry);
+    console.log('onResponse', inarry);
     var command = inarry[0],
       id = inarry[1],
       contentmode = inarry[2],
       content = inarry[3];
+    console.log('command', command);
     switch(command) {
       case 'a':
         this.reLinkDefer(id, this.content(contentmode, content));
@@ -56,7 +76,7 @@ function createRPCLogicClient(execlib, bufferlib) {
         this.notifyDefer(id, this.content(contentmode, content));
         break;
       case 'o':
-        console.log('OOB!', this.content(contentmode, content));
+        this.doOOB(inarry);
         break;
     }
     } catch(e) {
@@ -71,6 +91,21 @@ function createRPCLogicClient(execlib, bufferlib) {
     if (contentmode === 'b') {
       return content;
     }
+  };
+  RPCLogicClient.prototype.doOOB = function (inarry) {
+    try {
+    var carriersessionid = inarry[1],
+      oobchannel = inarry[2],
+      contentmode = inarry[3],
+      content = inarry[4],
+      oobcontent = this.content(contentmode, content);
+    console.log('doOOB!', contentmode, content, '=>', oobcontent, 'from carriersessionid', carriersessionid, 'on channel', oobchannel);
+    } catch(e) {
+      console.error(e.stack);
+      console.error(e);
+    }
+    //console.log('doOOB!', oobcontent);
+    //return [oobcontent[0], JSON.parse(oobcontent[1])];
   };
   RPCLogicClient.prototype.reLinkDefer = function (id, myid) {
     var myd = this.mydefers.remove(myid),
