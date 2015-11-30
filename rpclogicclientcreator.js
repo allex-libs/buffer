@@ -13,7 +13,7 @@ function createRPCLogicClient(execlib, bufferlib) {
   }
   lib.inherit(InLogic, bufferlib.ConditionalLogic);
   InLogic.prototype.logicNameFromResults = function () {
-    console.log('InLogic logicNameFromResults', this.results);
+    console.log('InLogic logicNameFromResults', this.results[0]);
     return this.results[0];
   };
   InLogic.prototype.onParseDone = function (modechar, params){
@@ -21,7 +21,8 @@ function createRPCLogicClient(execlib, bufferlib) {
   };
   InLogic.prototype.criteriaLogicUserNames = ['Char'];
 
-  function RPCLogicClient(methoddescriptorprovider) {
+  function RPCLogicClient(methoddescriptorprovider, onoobcb) {
+    this.onoobcb = onoobcb;
     this.rpclogic = new bufferlib.RPCLogic(methoddescriptorprovider);
     //this.inlogic = new bufferlib.Logic(['Char', 'String', 'Char', 'Buffer'], this.onResponse.bind(this));
     this.inlogic = new InLogic(this.onResponse.bind(this));
@@ -50,18 +51,18 @@ function createRPCLogicClient(execlib, bufferlib) {
       this.rpclogic.destroy();
     }
     this.rpclogic = null;
+    this.onoobcb = null;
   };
   RPCLogicClient.prototype.takeBuffer = function (buff) {
     this.inlogic.takeBuffer(buff);
   };
   RPCLogicClient.prototype.onResponse = function (inarry) {
-    try {
     console.log('onResponse', inarry);
+    try {
     var command = inarry[0],
       id = inarry[1],
       contentmode = inarry[2],
       content = inarry[3];
-    console.log('command', command);
     switch(command) {
       case 'a':
         this.reLinkDefer(id, this.content(contentmode, content));
@@ -98,8 +99,12 @@ function createRPCLogicClient(execlib, bufferlib) {
       oobchannel = inarry[2],
       contentmode = inarry[3],
       content = inarry[4],
-      oobcontent = this.content(contentmode, content);
-    console.log('doOOB!', contentmode, content, '=>', oobcontent, 'from carriersessionid', carriersessionid, 'on channel', oobchannel);
+      oobcontent;
+      if(this.onoobcb) {
+        oobcontent = this.content(contentmode, content);
+    //console.log('doOOB!', contentmode, content, '=>', oobcontent, 'from carriersessionid', carriersessionid, 'on channel', oobchannel);
+        this.onoobcb(oobchannel, oobcontent);
+      }
     } catch(e) {
       console.error(e.stack);
       console.error(e);

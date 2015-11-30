@@ -17,10 +17,10 @@ function createRPCLogicServer(execlib, bufferlib) {
     this.id = null;
   };
 
-  function RPCLogicServer(callable, methoddescriptorprovider, outcb) {
+  function RPCLogicServer(callable, methoddescriptorprovider, outcb, boundparams) {
     this.callable = callable;
     this.outcb = outcb;
-    this.rpc = new RPCLogic(methoddescriptorprovider, this.onRPC.bind(this));
+    this.rpc = new RPCLogic(methoddescriptorprovider, this.onRPC.bind(this), boundparams);
     this.pendingDefers = new lib.Map();
   }
   RPCLogicServer.prototype.destroy = function () {
@@ -71,7 +71,7 @@ function createRPCLogicServer(execlib, bufferlib) {
       //outarry = [outarry[0], outarry[1], 'j', this.nonBufferContentToBuffer(content)];
     }
     var ret = (outlogic || _outLogic).toBuffer(outarry);
-    console.log('pack', outarry, '=>', ret);
+    //console.log('pack', outarry, '=>', ret);
     return ret;
   };
   RPCLogicServer.prototype.nonBufferContentToBuffer = function(content) {

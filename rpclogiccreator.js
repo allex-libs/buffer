@@ -17,15 +17,17 @@ function createRPCLogic(execlib, bufferlib) {
     }
   }
 
-  function RPCLogic(methoddescriptorprovider, outercb) {
+  function RPCLogic(methoddescriptorprovider, outercb, boundparams) {
     ConditionalLogic.call(this, outercb);//this, ['String', 'String'], this.onIDWithMethod.bind(this));
     this.methodDescriptorProvider = methoddescriptorprovider;
+    this.boundparams = boundparams;
     this.caller = null;
   }
   lib.inherit(RPCLogic, ConditionalLogic);
 
   RPCLogic.prototype.destroy = function () {
     this.caller = null;
+    this.boundparams = null;
     this.methodDescriptorProvider = null;
     ConditionalLogic.prototype.destroy.call(this);
   };
@@ -96,7 +98,7 @@ function createRPCLogic(execlib, bufferlib) {
     var callerid = this.caller.callerid,
       methodname = this.caller.methodname;
     this.caller = null;
-    this.finalizeCycle(callerid, [methodname,params.slice()]);
+    this.finalizeCycle(callerid, [methodname,params.slice(),this.boundparams]);
   };
 
   RPCLogic.prototype.toBuffer = function (callerid, methodname, paramsarry) {

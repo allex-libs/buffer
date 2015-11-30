@@ -2,12 +2,13 @@ var net = require('net');
 
 function createTcpCallableStandaloneClient(execlib, bufferlib) {
   'use strict';
-  function TcpCallableStandaloneClient(servicemodulename, host, port, username, password, loggedincb) {
+  function TcpCallableStandaloneClient(servicemodulename, host, port, username, password, loggedincb, onoobcb) {
     this.host = host;
     this.port = port;
     this.username = username;
     this.password = password;
     this.loggedincb = loggedincb;
+    this.onoobcb = onoobcb;
     this.session = null;
     this.socket = new net.Socket();
     this.socket.on('error', console.error.bind(console, 'socket error'));
@@ -26,6 +27,7 @@ function createTcpCallableStandaloneClient(execlib, bufferlib) {
     this.rpcclient = null;
     this.socket = null;
     this.session = null;
+    this.onoobcb = null;
     this.loggedincb = null;
     this.password = null;
     this.username = null;
@@ -33,10 +35,10 @@ function createTcpCallableStandaloneClient(execlib, bufferlib) {
     this.host = null;
   };
   TcpCallableStandaloneClient.prototype.onServicePack = function (servicepack) {
-    console.log('servicepack', servicepack);
+    //console.log('servicepack', servicepack);
     try {
     var serviceuserprototype = servicepack.Service.prototype.userFactory.get('service').prototype;
-    this.rpcclient = new bufferlib.RPCLogicClient(serviceuserprototype.__methodDescriptors);
+    this.rpcclient = new bufferlib.RPCLogicClient(serviceuserprototype.__methodDescriptors, this.onoobcb);
     this.goConnect();
     } catch(e) {
       console.error(e.stack);
@@ -60,7 +62,7 @@ function createTcpCallableStandaloneClient(execlib, bufferlib) {
       return;
     }
     try {
-    var c = this.rpcclient.call('login', 'indata', '123');
+    var c = this.rpcclient.call('login', this.username, this.password);
     console.log(c);
     c.promise.then(
       this.onLoggedIn.bind(this),
@@ -74,15 +76,15 @@ function createTcpCallableStandaloneClient(execlib, bufferlib) {
   };
   TcpCallableStandaloneClient.prototype.onLoggedIn = function (session) {
     this.session = session;
-    console.log('onLoggedIn', this.session);
-    this.loggedincb(this, true);
+    //console.log('onLoggedIn', this.session);
+    this.loggedincb(this, this.session);
   };
   TcpCallableStandaloneClient.prototype.onClose = function () {
     console.log('socket closed', arguments);
     this.destroy();
   };
   TcpCallableStandaloneClient.prototype.onData = function (data) {
-    console.log('data!', data);
+    //console.log('data!', data);
     this.rpcclient.takeBuffer(data);
   };
   TcpCallableStandaloneClient.prototype.call = function (methodname) {

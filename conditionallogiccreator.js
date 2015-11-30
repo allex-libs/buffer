@@ -29,7 +29,7 @@ function createConditionalLogic(execlib, bufferlib) {
       return;
     }
     logicname = this.logicNameFromResults();
-    console.log('onTimeToSwitchLogic', this.results, '=>', logicname);
+    //console.log('onTimeToSwitchLogic', this.results, '=>', logicname);
     logic = this.getLogic(logicname);
     if (logic) {
       this.activateLogic(logic);
@@ -56,11 +56,15 @@ function createConditionalLogic(execlib, bufferlib) {
     }
   };
   ConditionalLogic.prototype.finalizeCycle = function (param1foroutercb, param2foroutercb){
+    console.log('finalizeCycle', arguments);
     var logic = this.parsingLogic,
-      currpos = logic.currentPosition();
+      currpos;
     //console.log('currentPosition', currpos);
     this.parsingLogic = null;
-    this.users[0].init(currpos, 0);
+    if (logic) {
+      currpos = logic.currentPosition();
+      this.users[0].init(currpos, 0);
+    }
     if (!this.outercb) {
       //this.destroy();
     } else {
