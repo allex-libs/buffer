@@ -9,7 +9,7 @@ function createConditionalLogic(execlib, bufferlib) {
     this.logics = new lib.Map();
     this.parsingLogic = null;
     this.outercb = outercb;
-    console.log('ConditionalLogic created', this);
+    //console.log('ConditionalLogic created', this);
   }
   lib.inherit(ConditionalLogic, Logic);
   ConditionalLogic.prototype.destroy = function () {
