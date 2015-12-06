@@ -56,7 +56,7 @@ function createConditionalLogic(execlib, bufferlib) {
     }
   };
   ConditionalLogic.prototype.finalizeCycle = function (param1foroutercb, param2foroutercb){
-    console.log('finalizeCycle', arguments);
+    //console.log('finalizeCycle', arguments);
     var logic = this.parsingLogic,
       currpos;
     //console.log('currentPosition', currpos);

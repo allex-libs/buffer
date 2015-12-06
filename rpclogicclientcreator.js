@@ -18,6 +18,7 @@ function createRPCLogicClient(execlib, bufferlib) {
   };
   InLogic.prototype.onParseDone = function (modechar, params){
     this.finalizeCycle([modechar].concat(params));
+    return 'stop';
   };
   InLogic.prototype.criteriaLogicUserNames = ['Char'];
 

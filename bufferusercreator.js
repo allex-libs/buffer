@@ -12,6 +12,10 @@ function createBufferUser(execlib, BufferUserBase) {
     this.buflen = null;
     BufferUserBase.prototype.destroy.call(this);
   };
+  BufferUser.prototype.init = function (buff, cursor) {
+    BufferUserBase.prototype.init.call(this, buff, cursor);
+    this.buflen = null;
+  };
   BufferUser.prototype.use = function () {
     if (!this.buflen && this.availableBytes()>_LENBUFFSIZE) {
       this.buflen = this.buffer.readUInt32LE(this.cursor);
@@ -22,6 +26,7 @@ function createBufferUser(execlib, BufferUserBase) {
     var neededbytes = this.buflen+_LENBUFFSIZE,
       availablebytes = this.buffer.length-this.cursor,
       ret;
+    //console.log('BufferUser needs', neededbytes, 'bytes');
     if (neededbytes<=availablebytes) {
       //console.log('slicing from', this.cursor, 'for', this.buflen, 'bytes on buffer of', this.buffer.length, 'bytes');
       ret = this.buffer.slice(this.cursor+_LENBUFFSIZE, this.cursor+_LENBUFFSIZE+this.buflen);

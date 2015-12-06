@@ -82,9 +82,11 @@ function createLogic(execlib, bufferlib) {
       }
       ret = this.process();
     }
-    buffer = this.buffers.shift();
-    if (buffer) {
-      this.takeBuffer(buffer);
+    if (!this.blocked) {
+      buffer = this.buffers.shift();
+      if (buffer) {
+        this.takeBuffer(buffer);
+      }
     }
   };
   function resetter(user) {
@@ -107,6 +109,7 @@ function createLogic(execlib, bufferlib) {
         this.reset();
       }
       this.results[this.current] = ret;
+      //console.log('results', this.results, 'currently at', this.current);
       this.current++;
       if (this.current === this.users.length) {
         this.current = 0;
