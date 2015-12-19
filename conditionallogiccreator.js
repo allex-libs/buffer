@@ -22,18 +22,29 @@ function createConditionalLogic(execlib, bufferlib) {
     this.logics = null;
     Logic.prototype.destroy.call(this);
   };
+  ConditionalLogic.prototype.takeBuffer = function (buff) {
+    //console.log('ConditionalLogic takeBuffer', buff, ', parsingLogic', this.parsingLogic);
+    if (this.parsingLogic) {
+      this.parsingLogic.takeBuffer(buff);
+    } else {
+      Logic.prototype.takeBuffer.call(this, buff);
+    }
+  };
   ConditionalLogic.prototype.onTimeToSwitchLogic = function () {
+    //console.trace();
+    //console.log('onTimeToSwitchLogic maybe, parsingLogic', this.parsingLogic);
     var logicname, logic;
     if (this.parsingLogic) {
       throw new lib.Error('SHOULDNT_HAVE_HAD_PARSING_LOGIC');
-      return;
     }
     logicname = this.logicNameFromResults();
     //console.log('onTimeToSwitchLogic', this.results, '=>', logicname);
     logic = this.getLogic(logicname);
     if (logic) {
+      //console.log('activating logic');
       this.activateLogic(logic);
     }
+    return 'stop';
   };
   ConditionalLogic.prototype.activateLogic = function (logic) {
     this.parsingLogic = logic;
@@ -59,10 +70,10 @@ function createConditionalLogic(execlib, bufferlib) {
     //console.log('finalizeCycle', arguments);
     var logic = this.parsingLogic,
       currpos;
-    //console.log('currentPosition', currpos);
     this.parsingLogic = null;
     if (logic) {
       currpos = logic.currentPosition();
+      //console.log('currentPosition', currpos);
       this.users[0].init(currpos, 0);
     }
     if (!this.outercb) {

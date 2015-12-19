@@ -13,12 +13,12 @@ function createRPCLogicClient(execlib, bufferlib) {
   }
   lib.inherit(InLogic, bufferlib.ConditionalLogic);
   InLogic.prototype.logicNameFromResults = function () {
-    console.log('InLogic logicNameFromResults', this.results[0]);
+    //console.log('InLogic logicNameFromResults', this.results[0]);
     return this.results[0];
   };
   InLogic.prototype.onParseDone = function (modechar, params){
-    this.finalizeCycle([modechar].concat(params));
-    return 'stop';
+    //console.log(modechar, 'step done with', params);
+    return this.finalizeCycle([modechar].concat(params));
   };
   InLogic.prototype.criteriaLogicUserNames = ['Char'];
 
@@ -58,7 +58,7 @@ function createRPCLogicClient(execlib, bufferlib) {
     this.inlogic.takeBuffer(buff);
   };
   RPCLogicClient.prototype.onResponse = function (inarry) {
-    console.log('onResponse', inarry);
+    //console.log('onResponse', inarry);
     try {
     var command = inarry[0],
       id = inarry[1],
