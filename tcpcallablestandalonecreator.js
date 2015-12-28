@@ -7,7 +7,7 @@ function createTcpCallableStandalone(execlib, bufferlib) {
   function Connection(callable, socket) {
     this.callable = callable;
     this.socket = socket;
-    console.log('__methodDescriptors', this.callable.__methodDescriptors);
+    //console.log('__methodDescriptors', this.callable.__methodDescriptors);
     this.rpcserver = new bufferlib.RPCLogicServer(this.callable, this.callable.__methodDescriptors, this.doSend.bind(this), this);
     this.oobLogic = new bufferlib.Logic(['Char', 'String', 'Char', 'Char', 'Buffer']);
     this.session = null;
@@ -44,7 +44,7 @@ function createTcpCallableStandalone(execlib, bufferlib) {
   };
   Connection.prototype.doSend = function (outbuff) {
     if (this.socket){
-      console.log('doSend', outbuff, outbuff.toString());
+      //console.log('doSend', outbuff, outbuff.toString());
       this.socket.write(outbuff);
     }
   };
@@ -52,7 +52,7 @@ function createTcpCallableStandalone(execlib, bufferlib) {
     if (!this.socket) {
       return null;
     }
-    console.log('should send data', data);
+    //console.log('should send data', data);
     var oob = data.oob;
     if (oob) {
       this.doSend(this.rpcserver.pack(['o', oob[0], oob[1], oob[2]], this.oobLogic));

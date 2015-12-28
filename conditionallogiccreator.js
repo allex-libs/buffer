@@ -74,9 +74,10 @@ function createConditionalLogic(execlib, bufferlib) {
     if (logic) {
       currpos = logic.currentPosition();
       //console.log('currentPosition', currpos);
-      this.users[0].init(currpos, 0);
+      //this.users[0].init(currpos, 0);
     }
     if (!this.outercb) {
+      console.error('no outercb in ConditionalLogic?!');
       //this.destroy();
     } else {
       //console.log('calling out with', params);
@@ -87,7 +88,15 @@ function createConditionalLogic(execlib, bufferlib) {
         console.error(e);
       }
     }
+    console.log('finalizeCycle ends on', currpos ? currpos.toString() : 'null');
+    if (currpos) {
+      lib.runNext(this.cycleAgain.bind(this, currpos));
+    }
     return 'stop';
+  };
+  ConditionalLogic.prototype.cycleAgain = function (buff) {
+    this.reset();
+    this.takeBuffer(buff);
   };
 
   return ConditionalLogic;
