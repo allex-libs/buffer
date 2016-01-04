@@ -88,7 +88,7 @@ function createConditionalLogic(execlib, bufferlib) {
         console.error(e);
       }
     }
-    console.log('finalizeCycle ends on', currpos ? currpos.toString() : 'null');
+    //console.log('finalizeCycle ends on', currpos ? currpos.toString() : 'null');
     if (currpos) {
       lib.runNext(this.cycleAgain.bind(this, currpos));
     }
