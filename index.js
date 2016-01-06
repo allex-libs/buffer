@@ -21,6 +21,8 @@ function createBufferLib (execlib) {
     IntegerStringUser: require('./integerstringusercreator')(execlib, StringUser),
     JSONStringUser: require('./jsonstringusercreator')(execlib, StringUser)
   };
+  ret.ArrayUser = require('./arrayusercreator')(execlib, ret);
+  ret.Int8User = require('./int8usercreator')(execlib, ret);
 
   ret.Logic = require('./logiccreator')(execlib, ret);
   ret.SynchronousLogic = require('./synchronouslogiccreator')(execlib, ret);

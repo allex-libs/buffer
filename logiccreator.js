@@ -1,15 +1,9 @@
 function createLogic(execlib, bufferlib) {
   'use strict';
   var lib = execlib.lib,
-    q = lib.q;
+    q = lib.q,
+    makeUpUserName = require('./usernamemakeuper');
 
-  var _UserWord = 'User';
-  function makeUpUserName(username) {
-    if (username.lastIndexOf(_UserWord) !== username.length-_UserWord.length) {
-      return username+'User';
-    }
-    return username;
-  }
   function userProducer(username, args) {
     if (lib.isString(username)) {
       return new bufferlib[makeUpUserName(username)]();
