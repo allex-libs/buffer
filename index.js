@@ -62,6 +62,19 @@ function createBufferLib (execlib) {
     }
   };
 
+  ret.toBuffer = function (obj) {
+    if (Buffer.isBuffer(obj)) {
+      return obj;
+    }
+    if ('object' === typeof obj && obj.type === 'Buffer' && lib.isArray(obj.data)){ 
+      var ret = new Buffer(obj.data.length);
+      obj.data.forEach(function(b, ind) {
+        ret[ind] = b;
+      });
+      return ret;
+    }
+  };
+
   return ret;
 }
 
