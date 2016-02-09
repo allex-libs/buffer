@@ -113,6 +113,7 @@ function createLogic(execlib, bufferlib) {
   }
   Logic.prototype.neededBytes = function (dataarray) {
     if (dataarray.length !== this.users.length) {
+      console.log('dataarray: ',dataarray);
       throw new lib.Error('DATA_ARRAY_LENGTH_MISMATCH', 'Data array provided has to be '+this.users.length+' elements long');
     }
     return dataarray.reduce(bytelenSummer.bind(null, this.users), 0)
