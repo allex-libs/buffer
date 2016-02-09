@@ -6,9 +6,13 @@ function createSynchronousLogic(execlib, bufferlib) {
 
   function SynchronousLogic(usernamearray) {
     Logic.call(this, usernamearray, this.syncResult.bind(this));
-    this.gotit = false;
+    this.gotit = null;
   }
   lib.inherit(SynchronousLogic, Logic);
+  SynchronousLogic.prototype.destroy = function () {
+    this.gotit = null;
+    Logic.prototype.destroy.call(this);
+  };
   SynchronousLogic.prototype.decode = function (buffer) {
     if (!Buffer.isBuffer(buffer)) {
       return null;
@@ -16,16 +20,19 @@ function createSynchronousLogic(execlib, bufferlib) {
     if (buffer.length < 1) {
       return null;
     }
-    this.gotit = false;
+    this.gotit = void 0;
     this.takeBuffer(buffer);
-    if (!this.gotit) {
+    if ('undefined' === typeof this.gotit) {
       console.log(buffer, 'not valid?');
       throw new lib.Error('INVALID_BUFFER_FOR_DECODE');
     }
-    return this.results.slice(0);
+    return this.gotit;
   };
   SynchronousLogic.prototype.syncResult = function () {
-    this.gotit = true;
+    if ('undefined' === typeof this.gotit) {
+      this.gotit = this.results.slice(0);
+      return 'stop';
+    }
   };
 
   return SynchronousLogic;

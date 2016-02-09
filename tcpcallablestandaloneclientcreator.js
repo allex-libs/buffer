@@ -84,7 +84,7 @@ function createTcpCallableStandaloneClient(execlib, bufferlib) {
     this.destroy();
   };
   TcpCallableStandaloneClient.prototype.onData = function (data) {
-    console.log('data!', data, data.toString());
+    //console.log('data!', data, data.toString());
     this.rpcclient.takeBuffer(data);
   };
   TcpCallableStandaloneClient.prototype.call = function (methodname) {

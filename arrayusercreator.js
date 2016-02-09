@@ -2,25 +2,23 @@ function createArrayUser(execlib, bufferlib) {
   'use strict';
   var lib = execlib.lib,
     BufferUserBase = bufferlib.BufferUserBase,
-    makeUpUserName = require('./usernamemakeuper');
+    userProducer = bufferlib.userProducer;
 
   function ArrayUser(typename) {
+    console.log('new ArrayUser', typename);
     BufferUserBase.call(this);
     this.lenhandler = new bufferlib.UInt16LEUser();
-    this.type = bufferlib[makeUpUserName(typename)];
+    this.typename = typename;
     this.results = null;
     this.resultslength = null;
     this.toparse = null;
-    if ('function' !== typeof this.type) {
-      throw new lib.Error('INVALID_LOGIC_USER_NAME', typename);
-    }
   }
   lib.inherit(ArrayUser, BufferUserBase);
   ArrayUser.prototype.destroy = function () {
     this.toparse = null;
     this.resultslength = null;
     this.results = null;
-    this.type = null;
+    this.typename = null;
     if (this.lenhandler) {
       this.lenhandler.destroy();
     }
@@ -35,7 +33,7 @@ function createArrayUser(execlib, bufferlib) {
     if (!lib.isArray(valarray)) {
       throw new lib.Error('NOT_AN_ARRAY');
     }
-    var type = new (this.type)();
+    var type = userProducer(this.typename);
     return valarray.reduce(neededbyter.bind(null, type), this.lenhandler.neededBytes(valarray.length)); //all neededBytes + 2 for the leading length
   };
   function tobufferer(type, buffer, offset, val) {
@@ -47,12 +45,13 @@ function createArrayUser(execlib, bufferlib) {
     if (!lib.isArray(valarray)) {
       throw new lib.Error('NOT_AN_ARRAY');
     }
-    var type = new (this.type)();
+    var type = userProducer(this.typename);
     this.lenhandler.toBuffer(valarray.length, buffer);
     valarray.reduce(tobufferer.bind(null, type, buffer), this.lenhandler.neededBytes(valarray.length));
   };
 
   ArrayUser.prototype.use = function () {
+    try {
     if (!this.buffer) {
       //console.log ('no buffer, no ByteArray now');
       return;
@@ -60,7 +59,6 @@ function createArrayUser(execlib, bufferlib) {
     if (!this.results) {
       this.lenhandler.init(this.buffer, this.cursor);
       var len = this.lenhandler.use();
-      console.log('len', len);
       if ('number' === typeof len) {
         this.resultslength = len;
         this.toparse = 0;
@@ -72,7 +70,7 @@ function createArrayUser(execlib, bufferlib) {
     if (!this.results) {
       return;
     }
-    var type = new (this.type)(), val;
+    var type = userProducer(this.typename), val;
     while (this.toparse < this.resultslength) {
       type.init(this.buffer, this.cursor);
       val = type.use();
@@ -89,6 +87,10 @@ function createArrayUser(execlib, bufferlib) {
     this.resultslength = null;
     this.toparse = null;
     return results;
+    } catch(e) {
+      console.error(e.stack);
+      console.error(e);
+    }
   };
 
   return ArrayUser;

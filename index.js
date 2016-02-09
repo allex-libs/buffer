@@ -4,7 +4,21 @@ function createBufferLib (execlib) {
     BufferUserBase = require('./bufferuserbasecreator')(execlib),
     StringUser = require('./stringusercreator')(execlib, BufferUserBase);
 
+  function toBuffer(obj) {
+    if (Buffer.isBuffer(obj)) {
+      return obj;
+    }
+    if ('object' === typeof obj && obj.type === 'Buffer' && lib.isArray(obj.data)){ 
+      var ret = new Buffer(obj.data.length);
+      obj.data.forEach(function(b, ind) {
+        ret[ind] = b;
+      });
+      return ret;
+    }
+  };
+
   var ret = {
+    toBuffer: toBuffer,
     jsonSchemaDescriptor2UserNames: require('./jsonschemadescriptor2usernamescreator')(execlib),
     BufferUserBase: BufferUserBase,
     ByteUser: require('./byteusercreator')(execlib, BufferUserBase),
@@ -16,16 +30,18 @@ function createBufferLib (execlib) {
     UInt64LEUser: require('./uint64leusercreator')(execlib, BufferUserBase),
     Int32LEUser: require('./int32leusercreator')(execlib, BufferUserBase),
     ByteArrayUser: require('./bytearrayusercreator')(execlib, BufferUserBase),
-    BufferUser: require('./bufferusercreator')(execlib, BufferUserBase),
+    BufferUser: require('./bufferusercreator')(execlib, BufferUserBase, toBuffer),
     StringUser: StringUser,
     IntegerStringUser: require('./integerstringusercreator')(execlib, StringUser),
     JSONStringUser: require('./jsonstringusercreator')(execlib, StringUser)
   };
+  ret.userProducer = require('./userproducer')(execlib, ret);
   ret.ArrayUser = require('./arrayusercreator')(execlib, ret);
   ret.Int8User = require('./int8usercreator')(execlib, ret);
 
   ret.Logic = require('./logiccreator')(execlib, ret);
   ret.SynchronousLogic = require('./synchronouslogiccreator')(execlib, ret);
+  ret.LogicUser = require('./logicusercreator')(execlib, ret);
   ret.ConditionalLogic = require('./conditionallogiccreator')(execlib, ret);
   ret.RPCLogic = require('./rpclogiccreator')(execlib, ret);
   ret.RPCLogicServer = require('./rpclogicservercreator')(execlib, ret);
@@ -59,19 +75,6 @@ function createBufferLib (execlib) {
       },
       buffer: true,
       type: typename
-    }
-  };
-
-  ret.toBuffer = function (obj) {
-    if (Buffer.isBuffer(obj)) {
-      return obj;
-    }
-    if ('object' === typeof obj && obj.type === 'Buffer' && lib.isArray(obj.data)){ 
-      var ret = new Buffer(obj.data.length);
-      obj.data.forEach(function(b, ind) {
-        ret[ind] = b;
-      });
-      return ret;
     }
   };
 

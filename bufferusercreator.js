@@ -1,4 +1,4 @@
-function createBufferUser(execlib, BufferUserBase) {
+function createBufferUser(execlib, BufferUserBase, toBuffer) {
   'use strict';
   var lib = execlib.lib,
     _LENBUFFSIZE = 4;
@@ -37,9 +37,11 @@ function createBufferUser(execlib, BufferUserBase) {
     }
   };
   BufferUser.prototype.neededBytes = function (buff) {
+    buff = toBuffer(buff);
     return buff.length+_LENBUFFSIZE;
   };
   BufferUser.prototype.toBuffer = function (bufferitem, buffer) {
+    bufferitem = toBuffer(bufferitem);
     buffer.writeUInt32LE(bufferitem.length, 0);
     bufferitem.copy(buffer, _LENBUFFSIZE);
   };
