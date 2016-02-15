@@ -15,6 +15,14 @@
     "AllexJS",
     "Buffer"
   ],
-  "author": "HERS Belgrade",
-  "license": "ISC"
+  "author": {
+    "name": "HERS Belgrade"
+  },
+  "license": "ISC",
+  "gitHead": "77e6a4f20afff788221750accbedaf24b269f653",
+  "readme": "ERROR: No README data found!",
+  "_id": "allex_bufferlib@0.1.0",
+  "_shasum": "6a4bf04705fcaf2bbd4e70e1b6721ffa42f4bb3d",
+  "_from": "git+ssh://git@gitlab.hers.rs:allex_libs/buffer",
+  "_resolved": "git+ssh://git@gitlab.hers.rs:allex_libs/buffer#77e6a4f20afff788221750accbedaf24b269f653"
 }
