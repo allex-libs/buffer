@@ -100,7 +100,7 @@ function createArrayUser(execlib, bufferlib) {
 module.exports = createArrayUser;
 
 },{}],2:[function(require,module,exports){
-ALLEX.execSuite.libRegistry.add('allex_leveldblib',require('./index')(ALLEX));
+ALLEX.execSuite.libRegistry.add('allex_bufferlib',require('./index')(ALLEX));
 
 },{"./index":9}],3:[function(require,module,exports){
 (function (Buffer){

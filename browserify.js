@@ -1,1 +1,1 @@
-ALLEX.execSuite.libRegistry.add('allex_leveldblib',require('./index')(ALLEX));
+ALLEX.execSuite.libRegistry.add('allex_bufferlib',require('./index')(ALLEX));
