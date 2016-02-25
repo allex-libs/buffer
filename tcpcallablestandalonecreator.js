@@ -53,8 +53,9 @@ function createTcpCallableStandalone(execlib, bufferlib) {
       return null;
     }
     //console.log('should send data', data);
-    var oob = data.oob;
-    if (oob) {
+    var oob;
+    if (data[0] === 'oob') {
+      oob = data[1];
       this.doSend(this.rpcserver.pack(['o', oob[0], oob[1], oob[2]], this.oobLogic));
     }
   };
