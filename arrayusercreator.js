@@ -5,7 +5,6 @@ function createArrayUser(execlib, bufferlib) {
     userProducer = bufferlib.userProducer;
 
   function ArrayUser(typename) {
-    console.log('new ArrayUser', typename);
     BufferUserBase.call(this);
     this.lenhandler = new bufferlib.UInt16LEUser();
     this.typename = typename;
