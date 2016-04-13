@@ -63,10 +63,9 @@ function createTcpCallableStandaloneClient(execlib, bufferlib) {
     }
     try {
     var c = this.rpcclient.call('login', this.username, this.password);
-    console.log(c);
     c.promise.then(
       this.onLoggedIn.bind(this),
-      this.loggedincb.bind(null, this, false)
+      this.loggedincb.bind(null, null)
     );
     this.socket.write(c.buffer);
     } catch(e) {
