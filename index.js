@@ -4,16 +4,23 @@ function createBufferLib (execlib) {
     BufferUserBase = require('./bufferuserbasecreator')(execlib),
     StringUser = require('./stringusercreator')(execlib, BufferUserBase);
 
+  function array2buffer (array) {
+    var ret = new Buffer(array.length);
+    array.forEach(function(b, ind) {
+      ret[ind] = b;
+    });
+    return ret;
+  }
+
   function toBuffer(obj) {
     if (Buffer.isBuffer(obj)) {
       return obj;
     }
     if ('object' === typeof obj && obj.type === 'Buffer' && lib.isArray(obj.data)){ 
-      var ret = new Buffer(obj.data.length);
-      obj.data.forEach(function(b, ind) {
-        ret[ind] = b;
-      });
-      return ret;
+      return array2buffer(obj.data);
+    }
+    if (lib.isArray(obj)) {
+      return array2buffer(obj);
     }
   };
 
