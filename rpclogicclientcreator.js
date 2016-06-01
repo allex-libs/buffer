@@ -114,6 +114,9 @@ function createRPCLogicClient(execlib, bufferlib) {
     //return [oobcontent[0], JSON.parse(oobcontent[1])];
   };
   RPCLogicClient.prototype.reLinkDefer = function (id, myid) {
+    if (!this.mydefers) {
+      return;
+    }
     var myd = this.mydefers.remove(myid),
       hisd;
     if (!myd) {
@@ -123,6 +126,9 @@ function createRPCLogicClient(execlib, bufferlib) {
     this.hisdefers.add(id, myd);
   };
   RPCLogicClient.prototype.resolveDefer = function (id, result) {
+    if (!this.hisdefers) {
+      return;
+    }
     var d = this.hisdefers.remove(id);
     if (d) {
       d.resolve(result);
@@ -131,6 +137,9 @@ function createRPCLogicClient(execlib, bufferlib) {
     }
   };
   RPCLogicClient.prototype.rejectDefer = function (id, error) {
+    if (!this.hisdefers) {
+      return;
+    }
     var d = this.hisdefers.remove(id);
     if (d) {
       d.reject(error);
