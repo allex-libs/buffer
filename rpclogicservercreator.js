@@ -80,16 +80,14 @@ function createRPCLogicServer(execlib, bufferlib) {
 
   RPCLogicServer.prototype.onResolve = function (id, res) {
     if (this.pendingDefers) {
-      return;
+      this.pendingDefers.remove(id);
     }
-    this.pendingDefers.remove(id);
     this.spit(['r', id, res]);
   }; 
   RPCLogicServer.prototype.onError = function (id, error) {
     if (this.pendingDefers) {
-      return;
+      this.pendingDefers.remove(id);
     }
-    this.pendingDefers.remove(id);
     this.spit(['e', id, error]);
   }; 
   RPCLogicServer.prototype.onNotify = function (id, progress) {
