@@ -9,10 +9,12 @@ function createConditionalLogic(execlib, bufferlib) {
     this.logics = new lib.Map();
     this.parsingLogic = null;
     this.outercb = outercb;
+    this.tempCurrentPosition = null;
     //console.log('ConditionalLogic created', this);
   }
   lib.inherit(ConditionalLogic, Logic);
   ConditionalLogic.prototype.destroy = function () {
+    this.tempCurrentPosition = null;
     this.outercb = null;
     this.parsingLogic = null;
     if (this.logics) {
@@ -23,6 +25,10 @@ function createConditionalLogic(execlib, bufferlib) {
     Logic.prototype.destroy.call(this);
   };
   ConditionalLogic.prototype.takeBuffer = function (buff) {
+    if (this.tempCurrentPosition) {
+      this.tempCurrentPosition = Buffer.concat([this.tempCurrentPosition, buff]);
+      return;
+    }
     //console.log('ConditionalLogic takeBuffer', buff, ', parsingLogic', this.parsingLogic);
     if (this.parsingLogic) {
       this.parsingLogic.takeBuffer(buff);
@@ -68,13 +74,10 @@ function createConditionalLogic(execlib, bufferlib) {
   };
   ConditionalLogic.prototype.finalizeCycle = function (param1foroutercb, param2foroutercb){
     //console.log('finalizeCycle', arguments);
-    var logic = this.parsingLogic,
-      currpos;
+    var logic = this.parsingLogic;
     this.parsingLogic = null;
     if (logic) {
-      currpos = logic.currentPosition();
-      //console.log('currentPosition', currpos);
-      //this.users[0].init(currpos, 0);
+      this.tempCurrentPosition = logic.currentPosition();
     }
     if (!this.outercb) {
       console.error('no outercb in ConditionalLogic?!');
@@ -89,12 +92,14 @@ function createConditionalLogic(execlib, bufferlib) {
       }
     }
     //console.log('finalizeCycle ends on', currpos ? currpos.toString() : 'null');
-    if (currpos) {
-      lib.runNext(this.cycleAgain.bind(this, currpos));
+    if (this.tempCurrentPosition) {
+      lib.runNext(this.cycleAgain.bind(this));
     }
     return 'stop';
   };
-  ConditionalLogic.prototype.cycleAgain = function (buff) {
+  ConditionalLogic.prototype.cycleAgain = function () {
+    var buff = this.tempCurrentPosition;
+    this.tempCurrentPosition = null;
     this.reset();
     this.takeBuffer(buff);
   };

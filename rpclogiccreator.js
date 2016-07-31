@@ -98,8 +98,7 @@ function createRPCLogic(execlib, bufferlib) {
     var callerid = this.caller.callerid,
       methodname = this.caller.methodname;
     this.caller = null;
-    this.finalizeCycle(callerid, [methodname,params.slice(),this.boundparams]);
-    return 'stop';
+    return this.finalizeCycle(callerid, [methodname,params.slice(),this.boundparams]);
   };
 
   RPCLogic.prototype.toBuffer = function (callerid, methodname, paramsarry) {
