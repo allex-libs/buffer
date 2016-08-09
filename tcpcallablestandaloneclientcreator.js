@@ -15,7 +15,7 @@ function createTcpCallableStandaloneClient(execlib, bufferlib) {
     this.socket.on('data', this.onData.bind(this));
     this.socket.on('close', this.onClose.bind(this));
     this.rpcclient = null;
-    execlib.execSuite.registry.registerServerSide(servicemodulename).then(
+    execlib.execSuite.registry.registerClientSide(servicemodulename).then(
       this.onService.bind(this),
       this.onServiceError.bind(this)
     );
@@ -35,10 +35,9 @@ function createTcpCallableStandaloneClient(execlib, bufferlib) {
     this.host = null;
   };
   TcpCallableStandaloneClient.prototype.onService = function (service) {
-    //console.log('servicepack', servicepack);
+    //console.log('servicepack', service.get('service').prototype.ClientUser.prototype.__methodDescriptors);
     try {
-    var serviceuserprototype = service.prototype.userFactory.get('service').prototype;
-    this.rpcclient = new bufferlib.RPCLogicClient(serviceuserprototype.__methodDescriptors, this.onoobcb);
+    this.rpcclient = new bufferlib.RPCLogicClient(service.get('service').prototype.ClientUser.prototype.__methodDescriptors, this.onoobcb);
     this.goConnect();
     } catch(e) {
       console.error(e.stack);
