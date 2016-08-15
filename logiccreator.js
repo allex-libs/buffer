@@ -73,6 +73,9 @@ function createLogic(execlib, bufferlib) {
     this.takeBuffer();
   };
   Logic.prototype.reset = function () {
+    if (!this.users) {
+      return;
+    }
     this.users.forEach(resetter);
   };
   Logic.prototype.process = function (buffer) {
