@@ -119,17 +119,24 @@ function createLogic(execlib, bufferlib) {
       console.log('dataarray: ',dataarray);
       throw new lib.Error('DATA_ARRAY_LENGTH_MISMATCH', 'Data array provided has to be '+this.users.length+' elements long');
     }
-    return dataarray.reduce(bytelenSummer.bind(null, this.users), 0)
+    var _users = this.users, ret;
+    ret = dataarray.reduce(bytelenSummer.bind(null, _users), 0)
+    _users = null;
+    return ret;
   };
   Logic.prototype.toBuffer = function (dataarray, buffer, offset) {
-    var buflen = this.neededBytes(dataarray), ret;
+    var buflen = this.neededBytes(dataarray), ret, _ret, _users;
     if (dataarray.length !== this.users.length) {
       throw new lib.Error('DATA_ARRAY_LENGTH_MISMATCH', 'Data array provided has to be '+this.users.length+' elements long');
     }
     offset = offset || 0;
     buffer = buffer || new Buffer(buflen);
     ret = buffer.slice(offset, offset+buflen);
-    dataarray.reduce(bufferWriter.bind(null, ret, this.users), 0);
+    _ret = ret;
+    _users = this.users;
+    dataarray.reduce(bufferWriter.bind(null, _ret, _users), 0);
+    _ret = null;
+    _users = null;
     return ret;
   };
 

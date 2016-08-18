@@ -37,7 +37,9 @@ function createByteArrayUser(execlib, BufferUserBase) {
     if(numarray.length!==this.len) {
       throw new lib.Error('INVALID_NUMARRAY_LENGTH', 'Array of numbers provided to toBuffer needs to be '+this.len+' elements long');
     }
-    numarray.forEach(buffWriter.bind(null, buffer));
+    var _b = buffer;
+    numarray.forEach(buffWriter.bind(null, _b));
+    _b = null;
   };
 
   return ByteArrayUser;

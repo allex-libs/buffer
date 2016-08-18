@@ -18,18 +18,19 @@ function createBufferUserBase(execlib) {
     var b = this.buffer, tail, bc;
     if (buffer) {
       if (b) {
-        //console.log('concating at cursor', this.cursor, 'with original bufflen', this.buffer.length, 'at', this.currentPosition());
         if (this.cursor < b.length) {
+          /*
           tail = b.length-this.cursor;
           bc = new Buffer(tail + b.length);
           b.copy(bc, 0, this.cursor, b.length);
           buffer.copy(bc, tail, 0, buffer.length);
           this.buffer = bc;
+          */
+          this.buffer = Buffer.concat([b.slice(this.cursor), buffer]);
           this.cursor = 0;
         } else {
           this.init(buffer);
         }
-        //console.log('now the new bufflen is', this.buffer.length, 'and cursor is still', this.cursor, 'at', this.currentPosition());
       } else {
         this.init(buffer);
       }

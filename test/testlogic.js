@@ -12,6 +12,9 @@ var _port = './tester',
 function onStarted(execlib, server, Client) {
   var client = new Client(_port);
   client.go();
+  execlib = null;
+  client = null;
+  Client = null;
 }
 
 function onLib(execlib, bufferlib) {

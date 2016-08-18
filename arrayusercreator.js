@@ -32,8 +32,10 @@ function createArrayUser(execlib, bufferlib) {
     if (!lib.isArray(valarray)) {
       throw new lib.Error('NOT_AN_ARRAY');
     }
-    var type = userProducer(this.typename);
-    return valarray.reduce(neededbyter.bind(null, type), this.lenhandler.neededBytes(valarray.length)); //all neededBytes + 2 for the leading length
+    var type = userProducer(this.typename), _t = type, ret;
+    ret = valarray.reduce(neededbyter.bind(null, _t), this.lenhandler.neededBytes(valarray.length)); //all neededBytes + 2 for the leading length
+    _t = null;
+    return ret;
   };
   function tobufferer(type, buffer, offset, val) {
     var nb = type.neededBytes(val);
@@ -44,9 +46,11 @@ function createArrayUser(execlib, bufferlib) {
     if (!lib.isArray(valarray)) {
       throw new lib.Error('NOT_AN_ARRAY');
     }
-    var type = userProducer(this.typename);
+    var type = userProducer(this.typename), _t = type, _b = buffer;
     this.lenhandler.toBuffer(valarray.length, buffer);
-    valarray.reduce(tobufferer.bind(null, type, buffer), this.lenhandler.neededBytes(valarray.length));
+    valarray.reduce(tobufferer.bind(null, _t, _b), this.lenhandler.neededBytes(valarray.length));
+    _t = null;
+    _b = null;
   };
 
   ArrayUser.prototype.use = function () {
