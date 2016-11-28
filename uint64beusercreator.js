@@ -12,8 +12,8 @@ function createUInt64BEUser(execlib, BufferUserBase) {
     }
     //var ret = this.buffer.readUInt64BE(this.cursor);
     var ret = 0,
-      lo = this.buffer.readUInt32BE(this.cursor),
-      hi = this.buffer.readUInt32BE(this.cursor+4);
+      hi = this.buffer.readUInt32BE(this.cursor),
+      lo = this.buffer.readUInt32BE(this.cursor+4);
     ret += (lo);
     ret += ( hi * 0x100000000);
     //console.log('lo', lo, 'hi', hi, '=>', ret);
@@ -28,8 +28,8 @@ function createUInt64BEUser(execlib, BufferUserBase) {
     var hi = ~~(item / 0x100000000),
       lo = item % 0x100000000;
     //console.log(item, '=> lo', lo, 'hi', hi);
-    buffer.writeUInt32BE(lo, 0);
-    buffer.writeUInt32BE(hi, 4);
+    buffer.writeUInt32BE(hi, 0);
+    buffer.writeUInt32BE(lo, 4);
   };
 
   return UInt64BEUser;
