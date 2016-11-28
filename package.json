@@ -18,5 +18,8 @@
   "author": {
     "name": "HERS Belgrade"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "node-int64": "0.4.x"
+  }
 }
