@@ -11,7 +11,6 @@ function copy64mirror (src, target, srcstart, targetstart) {
   for (var i = 0; i<8; i++) {
     target[targetstart+7-i] = src[srcstart+i];
   }
-  console.log(src.slice(srcstart,srcstart+8), '=>', target.slice(targetstart, targetstart+8));
 }
 function createInt64LEUser(execlib, BufferUserBase) {
   'use strict';
@@ -29,7 +28,6 @@ function createInt64LEUser(execlib, BufferUserBase) {
     tb = new Buffer(8);
     copy64mirror(this.buffer, tb, this.cursor);
     ret = (new Int64(tb))+0;
-    console.log('le', tb, '=>', ret);
     this.cursor += 8;
     return ret;
   };
@@ -38,7 +36,7 @@ function createInt64LEUser(execlib, BufferUserBase) {
   };
   Int64LEUser.prototype.toBuffer = function (item, buffer) {
     var int64 = new Int64(item), tb = new Buffer(8);
-    item.copy(tb, 0);
+    int64.copy(tb, 0);
     copy64mirror(tb, buffer);
   };
 

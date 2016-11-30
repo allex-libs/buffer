@@ -22,7 +22,7 @@ function createInt64BEUser(execlib, BufferUserBase) {
   };
   Int64BEUser.prototype.toBuffer = function (item, buffer) {
     var int64 = new Int64(item);
-    item.copy(buffer, 0);
+    int64.copy(buffer, 0);
   };
 
   return Int64BEUser;
