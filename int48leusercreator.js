@@ -18,7 +18,6 @@ function createInt48LEUser(execlib, BufferUserBase) {
     return 6;
   };
   Int48LEUser.prototype.toBuffer = function (item, buffer) {
-    console.log('writeIntLE', item);
     buffer.writeIntLE(item, 0, 6);
   };
 
