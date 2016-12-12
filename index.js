@@ -78,20 +78,10 @@ function createBufferLib (execlib) {
     var sl = new this.SynchronousLogic(usernamearray);
     return {
       encode: function (arry) {
-        try {
         return sl.toBuffer(arry);
-        } catch(e) {
-          console.error(e.stack);
-          console.error(e);
-        }
       },
       decode: function (buff) {
-        try {
         return sl.decode(buff);
-        } catch(e) {
-          console.error(e.stack);
-          console.error(e);
-        }
       },
       buffer: true,
       type: typename
