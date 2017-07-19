@@ -1,6 +1,6 @@
 {
   "name": "allex_bufferlib",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Lib for Buffer manipulation",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@gitlab.hers.rs:allex_libs/buffer"
+    "url": "git@github.com:allex-libs/buffer.git"
   },
   "keywords": [
     "ecosystem:allex",
