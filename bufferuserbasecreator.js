@@ -21,7 +21,7 @@ function createBufferUserBase(execlib) {
         if (this.cursor < b.length) {
           /*
           tail = b.length-this.cursor;
-          bc = new Buffer(tail + b.length);
+          bc = Buffer.alloc(tail + b.length);
           b.copy(bc, 0, this.cursor, b.length);
           buffer.copy(bc, tail, 0, buffer.length);
           this.buffer = bc;

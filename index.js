@@ -5,7 +5,7 @@ function createBufferLib (execlib) {
     StringUser = require('./stringusercreator')(execlib, BufferUserBase);
 
   function array2buffer (array) {
-    var al = array.length, ret = new Buffer(al), i;
+    var al = array.length, ret = Buffer.alloc(al), i;
     for (i=0; i<al; i++) {
       ret[i] = array[i];
     }

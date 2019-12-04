@@ -1,12 +1,15 @@
 var _port = './tester',
   _usernames = [
     ['Array', ['Int8']],
+    ['Array', ['String']],
     'String',
-    'String',
-    'Int8',
+    'Char',
     'Byte',
-    'Byte',
-    'Byte'
+    'UInt16BE',
+    'UInt16LE',
+    'UInt48BE',
+    'UInt48LE',
+    'IntegerString'
   ];
 
 function onStarted(execlib, server, Client) {
@@ -81,7 +84,18 @@ function onLib(execlib, bufferlib) {
   };
   Client.prototype.onStarted = function () {
     try {
-    this.sock.write(this.logic.toBuffer([[-1,2,3],'9:00', '16:00',-15,0,0,60]));
+    this.sock.write(this.logic.toBuffer([
+      [-1,2,3],
+      ['a','b','c'],
+      'Wut?',
+      'a',
+      8,
+      15333,
+      12888,
+      123456789012,
+      987654321098,
+      '12345678'
+    ]));
     } catch(e) {
       console.error(e.stack);
       console.error(e);

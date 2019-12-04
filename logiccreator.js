@@ -130,7 +130,7 @@ function createLogic(execlib, bufferlib) {
       throw new lib.Error('DATA_ARRAY_LENGTH_MISMATCH', 'Data array provided has to be '+this.users.length+' elements long');
     }
     offset = offset || 0;
-    buffer = buffer || new Buffer(buflen);
+    buffer = buffer || Buffer.alloc(buflen);
     ret = buffer.slice(offset, offset+buflen);
     _ret = ret;
     _users = this.users;

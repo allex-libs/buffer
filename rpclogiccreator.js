@@ -107,7 +107,7 @@ function createRPCLogic(execlib, bufferlib) {
       logic = this.getLogic(methodname),
       paramsnb = logic.neededBytes(paramsarry),
       bufflen = methodnb+paramsnb,
-      buffer = new Buffer(bufflen);
+      buffer = Buffer.alloc(bufflen);
     Logic.prototype.toBuffer.call(this, methodarry, buffer, 0);
     logic.toBuffer(paramsarry, buffer, methodnb);
     return buffer;

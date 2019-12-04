@@ -75,7 +75,7 @@ function createRPCLogicServer(execlib, bufferlib) {
     return ret;
   };
   RPCLogicServer.prototype.nonBufferContentToBuffer = function(content) {
-    return new Buffer(JSON.stringify(content), 'utf8');
+    return Buffer.from(JSON.stringify(content), 'utf8');
   };
 
   RPCLogicServer.prototype.onResolve = function (id, res) {

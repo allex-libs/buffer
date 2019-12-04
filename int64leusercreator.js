@@ -25,7 +25,7 @@ function createInt64LEUser(execlib, BufferUserBase) {
     if (this.availableBytes() < 8) {
       return;
     }
-    tb = new Buffer(8);
+    tb = Buffer.alloc(8);
     copy64mirror(this.buffer, tb, this.cursor);
     ret = (new Int64(tb))+0;
     this.cursor += 8;
@@ -35,7 +35,7 @@ function createInt64LEUser(execlib, BufferUserBase) {
     return 8;
   };
   Int64LEUser.prototype.toBuffer = function (item, buffer) {
-    var int64 = new Int64(item), tb = new Buffer(8);
+    var int64 = new Int64(item), tb = Buffer.alloc(8);
     int64.copy(tb, 0);
     copy64mirror(tb, buffer);
   };
